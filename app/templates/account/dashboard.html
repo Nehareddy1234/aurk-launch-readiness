@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}My account &mdash; AURK{% endblock %}
+{% block content %}<div class="container"><a href="{{ url_for('auth.login_phone') }}">Manage phone sign-in</a></div>
+<section class="container account-page">
+  <header class="account-welcome"><div><p class="eyebrow">YOUR SPACE / AURK</p><h1>Hey, {{ current_user.first_name }}.</h1><p>Your orders, your details, your next fit.</p></div><a class="button" href="{{ url_for('products.shop') }}">Explore the collection <span aria-hidden="true">&nearr;</span></a></header>
+  <div class="account-layout">
+    <aside class="account-sidebar"><div class="account-identity"><span class="account-avatar" aria-hidden="true">{{ current_user.first_name[:1]|upper }}{{ current_user.last_name[:1]|upper }}</span><strong>{{ current_user.first_name }} {{ current_user.last_name }}</strong><small>Member since {{ current_user.created_at.strftime('%b %Y') }}</small></div>
+      <nav aria-label="Account navigation"><a href="#overview">Overview <span aria-hidden="true">&nearr;</span></a><a href="{{ url_for('orders.list_orders') }}">My orders <span aria-hidden="true">&nearr;</span></a><a href="{{ url_for('community.gallery') }}">Worn by you <span aria-hidden="true">&nearr;</span></a><a href="#profile">Account details <span aria-hidden="true">&nearr;</span></a><a href="#address">Delivery address <span aria-hidden="true">&nearr;</span></a><a href="{{ url_for('main.contact') }}">Need a hand? <span aria-hidden="true">&nearr;</span></a></nav>
+      <form method="post" action="{{ url_for('auth.logout') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit" class="account-signout">Sign out &rarr;</button></form>
+    </aside>
+    <div class="account-main">
+      <section id="overview" class="account-overview" aria-label="Order overview"><div><span>Total orders</span><strong>{{ total_orders }}</strong></div><div><span>In progress</span><strong>{{ active_orders }}</strong></div><div><span>Delivered</span><strong>{{ delivered_orders }}</strong></div></section>
+      <section class="account-panel"><header class="account-section-heading"><div><p class="eyebrow">KEEP UP WITH YOUR FITS</p><h2>Recent orders</h2></div><a href="{{ url_for('orders.list_orders') }}">View all &rarr;</a></header>
+        {% for order in recent_orders %}<a class="account-order" href="{{ url_for('orders.detail', order_number=order.order_number) }}"><div><strong>{{ order.order_number }}</strong><small>{{ order.created_at.strftime('%d %b %Y') }}</small></div><span class="account-order-status">{{ order.status_label }}</span><strong>&#8377;{{ '%.2f'|format(order.total) }} <span aria-hidden="true">&nearr;</span></strong></a>{% else %}<div class="account-empty"><span aria-hidden="true">&nearr;</span><h3>Your next favourite is out there.</h3><p>No orders yet. Explore the collection and start your rotation.</p><a class="button button-secondary" href="{{ url_for('products.shop') }}">Find your fit</a></div>{% endfor %}
+      </section>
+      <section id="profile" class="account-panel"><header class="account-section-heading"><div><p class="eyebrow">MAKE IT YOURS</p><h2>Account details</h2></div></header>
+        <form method="post" action="{{ url_for('orders.update_profile') }}" class="account-form"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><div class="account-form-grid"><label>First name<input name="first_name" value="{{ current_user.first_name }}" autocomplete="given-name" maxlength="100" required></label><label>Last name<input name="last_name" value="{{ current_user.last_name }}" autocomplete="family-name" maxlength="100" required></label><label>Phone <span class="muted">(optional)</span><input type="tel" name="phone" value="{{ current_user.phone or '' }}" autocomplete="tel" maxlength="30"></label><label>Email<input type="email" value="{{ current_user.email }}" readonly aria-describedby="account-email-help"></label></div><p id="account-email-help" class="account-help">Your email is your sign-in address. Contact us if you need help changing it.</p><div class="account-form-actions"><button type="submit" class="button">Save details</button><a href="{{ url_for('auth.forgot_password') }}">Reset password &rarr;</a></div></form>
+      </section>
+      <section id="address" class="account-panel"><header class="account-section-heading"><div><p class="eyebrow">WHERE YOUR NEXT FIT LANDS</p><h2>Delivery address</h2></div>{% if address %}<span class="account-order-status">Saved for checkout</span>{% endif %}</header><p class="account-help">{% if not address %}Add an address to make your next checkout easier. {% endif %}Changes apply to future checkouts. Existing orders keep their original delivery details.</p>
+        <form method="post" action="{{ url_for('orders.update_address') }}" class="account-form"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><div class="account-form-grid">
+          <label>Recipient name<input name="recipient_name" value="{{ address.recipient_name if address else current_user.first_name ~ ' ' ~ current_user.last_name }}" autocomplete="shipping name" maxlength="200" required></label>
+          <label>Phone<input type="tel" name="phone" value="{{ address.phone if address else current_user.phone or '' }}" autocomplete="shipping tel" maxlength="30" required></label>
+          <label class="account-full">Address line 1<input name="line1" value="{{ address.line1 if address else '' }}" autocomplete="shipping address-line1" maxlength="255" required></label>
+          <label class="account-full">Address line 2 <span class="muted">(optional)</span><input name="line2" value="{{ address.line2 or '' if address else '' }}" autocomplete="shipping address-line2" maxlength="255"></label>
+          <label>City<input name="city" value="{{ address.city if address else '' }}" autocomplete="shipping address-level2" maxlength="100" required></label>
+          <label>State<input name="state" value="{{ address.state if address else '' }}" autocomplete="shipping address-level1" maxlength="100" required></label>
+          <label>PIN code<input name="postal_code" value="{{ address.postal_code if address else '' }}" autocomplete="shipping postal-code" inputmode="numeric" pattern="[1-9][0-9]{5}" maxlength="6" required></label>
+          <label>Country<input name="country" value="India" autocomplete="shipping country-name" readonly></label>
+        </div><button type="submit" class="button">Save delivery address</button></form>
+      </section>
+    </div>
+  </div>
+</section>
+{% endblock %}

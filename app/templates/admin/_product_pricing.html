@@ -1,0 +1,12 @@
+{% set selected_status = request.form.get('product_status', product.product_status if product else 'available') %}
+{% set price_unannounced = selected_status == 'coming_soon' and (request.form.get('hide_price') == '1' if request.method == 'POST' else product and product.hide_price) %}
+<fieldset class="product-pricing" data-product-pricing>
+<legend>Price</legend>
+<div data-coming-soon-price-option {% if selected_status != 'coming_soon' %}hidden{% endif %}><label><input type="checkbox" name="hide_price" value="1" {% if price_unannounced %}checked{% endif %}> Price not announced yet (Coming soon only)</label>
+<p class="form-help">Check this to leave the price empty and hide it from customers until you announce it.</p></div>
+<div class="product-pricing-row">
+<label>Total price (₹)<input type="number" name="base_price" min="0" max="9999999999.99" step="0.01" value="{{ request.form.get('base_price', product.base_price if product and (not product.hide_price or product.base_price) else '') }}" {% if not price_unannounced %}required{% endif %}></label>
+<label>Discount (%) — optional<input type="number" name="discount_percent" min="0" max="100" step="any" placeholder="e.g. 10" value="{{ request.form.get('discount_percent', product.discount_percent if product else '') }}"></label>
+</div>
+<p class="form-help" data-price-preview aria-live="polite">Leave the discount empty to sell at the total price.</p>
+</fieldset>

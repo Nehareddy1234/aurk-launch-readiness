@@ -1,0 +1,105 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Products — Admin{% endblock %}
+
+{% block content %}
+<section class="container admin-products-page">
+    <div class="admin-products-header">
+        <div>
+            <p class="eyebrow">Catalogue</p>
+            <h1>{{ 'Dashboard' if dashboard else 'Manage products' }}</h1>
+            <p class="admin-products-subtitle">Edit products, monitor stock, and control what customers see.</p>
+        </div>
+        {% if current_user.has_permission("products.create") %}<a class="button" href="{{ url_for('admin.create_product') }}">Add product</a>{% endif %}
+    </div>
+
+    {% if current_user.has_permission("products.update") %}<p><a class="button" href="{{ url_for('admin.categories') }}">Manage categories</a></p>{% endif %}
+
+    <form class="admin-product-filters" method="get" action="{{ url_for('admin.dashboard' if dashboard else 'admin.products') }}">
+        <label class="screen-reader-text" for="admin-search">Search products</label>
+        <input id="admin-search" type="search" name="q" value="{{ q }}" placeholder="Search name or SKU slug">
+        <select name="category" aria-label="Filter by category">
+            <option value="">All categories</option>
+            {% for category in categories %}
+                <option value="{{ category.id }}" {% if category.id == category_id %}selected{% endif %}>{{ category.name }}</option>
+            {% endfor %}
+        </select>
+        <select name="status" aria-label="Filter by status">
+            <option value="all" {% if status == 'all' %}selected{% endif %}>All products</option>
+            <option value="live" {% if status == 'live' %}selected{% endif %}>Live only</option>
+            <option value="hidden" {% if status == 'hidden' %}selected{% endif %}>Hidden only</option>
+        </select>
+        <button class="button" type="submit">Filter</button>
+        {% if q or category_id or status != 'all' %}
+            <a class="filter-reset" href="{{ url_for('admin.dashboard' if dashboard else 'admin.products') }}">Reset</a>
+        {% endif %}
+    </form>
+
+    <div class="admin-product-list">
+        {% for product in products %}
+            <article class="admin-product-card">
+                <a class="admin-product-image" href="{{ url_for('admin.edit_product', product_id=product.id) if current_user.has_permission('products.update') else url_for('admin.products') }}">
+                    {% if product.primary_image %}
+                        <img src="{{ url_for('admin.product_image', image_id=product.primary_image.id) }}" alt="{{ product.name }}">
+                    {% else %}
+                        <div class="admin-no-image">No image</div>
+                    {% endif %}
+                </a>
+
+                <div class="admin-product-details">
+                    <div class="admin-product-heading">
+                        <div>
+                            <p class="admin-product-category">{{ product.category.name if product.category else 'Uncategorised' }}</p>
+                            <h2>{{ product.name }}</h2>
+                            <p class="admin-product-slug">/{{ product.slug }}</p>
+                        </div>
+                        <span class="status-pill {% if product.is_active %}status-active{% else %}status-hidden{% endif %}">
+                            {{ 'Live' if product.is_active else 'Hidden' }}
+                        </span>
+                    </div>
+
+                    <div class="admin-product-meta">
+{% if product.show_price %}
+                        <strong>₹{{ '%.2f'|format(product.current_price) }}</strong>
+                        {% if product.sale_price is not none %}<span>was ₹{{ '%.2f'|format(product.base_price) }}</span>{% endif %}
+{% else %}<strong>Price not announced</strong>{% endif %}
+                        {% if product.is_featured %}<span class="tag">Featured</span>{% endif %}
+                        {% if product.is_new_arrival %}<span class="tag">New</span>{% endif %}
+                        {% if product.is_bestseller %}<span class="tag">Bestseller</span>{% endif %}
+                    </div>
+
+                    <details class="variant-grid" {% if not product.variants %}open{% endif %}>
+                        <summary>Options & stock <span>{{ product.variants|length }} SKU{{ '' if product.variants|length == 1 else 's' }}</span></summary>
+                        {% for variant in product.variants %}
+                            {% if current_user.has_permission("products.update") %}<form method="post" action="{{ url_for('admin.update_variant', product_id=product.id, variant_id=variant.id) }}" class="variant-admin-row">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <div><strong>{{ variant.size.name }} / {{ variant.color.name }}</strong><small>{{ variant.sku }}</small></div>
+                                <label>Stock<input type="number" name="quantity" min="0" value="{{ variant.inventory.quantity if variant.inventory else 0 }}" required></label>
+                                <label class="variant-live"><input type="checkbox" name="is_active" value="1" {% if variant.is_active %}checked{% endif %}> Live</label>
+                                <button type="submit">Save</button>
+                            </form>{% else %}<p>{{ variant.sku }} &middot; Stock: {{ variant.inventory.quantity if variant.inventory else 0 }}</p>{% endif %}
+                        {% else %}
+                            <p class="empty-note">No sellable SKU yet. Add one in Edit product.</p>
+                        {% endfor %}
+                    </details>
+
+                    <div class="admin-product-actions">
+                        <a class="button button-secondary" href="{{ url_for('products.detail', slug=product.slug) }}">View</a>
+                        {% if current_user.has_permission("products.update") %}<a class="button" href="{{ url_for('admin.edit_product', product_id=product.id) }}">Edit product</a>{% endif %}
+                        {% if current_user.has_permission("products.delete") %}<form method="post" action="{{ url_for('admin.delete_product', product_id=product.id) }}" data-confirm="Remove this product from the catalogue? Past order and inventory records will be retained.">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="button button-danger">Delete</button>
+                        </form>{% endif %}
+                    </div>
+                </div>
+            </article>
+        {% else %}
+            <div class="admin-empty-products">
+                <h2>No products yet</h2>
+                <p>Add your first product, images, and sellable options to begin.</p>
+                <a class="button" href="{{ url_for('admin.create_product') }}">Add your first product</a>
+            </div>
+        {% endfor %}
+    </div>
+<nav class="pagination" aria-label="Pagination"><span>{{ pagination.total }} product(s)</span><div>{% if pagination.has_prev %}<a href="{{ url_for('admin.products',page=pagination.prev_num,q=q,status=status,category=category_id) }}">&larr; Previous</a>{% endif %}{% if pagination.has_next %}<a href="{{ url_for('admin.products',page=pagination.next_num,q=q,status=status,category=category_id) }}">Next &rarr;</a>{% endif %}</div></nav></section>
+{% endblock %}

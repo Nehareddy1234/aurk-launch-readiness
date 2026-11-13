@@ -1,0 +1,11 @@
+[Unit]
+Description=AURK private off-server data backup
+After=network-online.target
+OnFailure=aurk-alert@%n.service
+[Service]
+Type=oneshot
+User=root
+EnvironmentFile=/etc/aurk/backup.env
+ExecStart=/usr/bin/flock --nonblock /run/lock/aurk-maintenance.lock /bin/bash /home/ubuntu/Aurk/deploy/backup-maintenance.sh
+TimeoutStartSec=30min
+UMask=0077

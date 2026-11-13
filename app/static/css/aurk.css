@@ -1,0 +1,127 @@
+/* A U R K: warm typography, charcoal surfaces and restrained motion. */
+:root { --paper:#0e0f11; --ink:#f2ede4; --soft-ink:#bbb6ad; --line:#353638; --olive:#d7bd91; --brand-navy:#f2ede4; --brand-blue:#d7bd91; --brand-cyan:#806c4e; --brand-surface:#0e0f11; }
+html { color-scheme:dark; background:#0e0f11; }
+.aurk-wordmark { display:block; white-space:nowrap; font-family:"Segoe UI",Arial,sans-serif; font-size:30px; font-weight:500; letter-spacing:.18em; line-height:1.4; color:#f2ede4; }
+.storefront-theme { background:radial-gradient(ellipse at 75% 5%,#302a203b,transparent 42%),#0e0f11; }
+.storefront-theme .site-header { min-height:86px; padding-top:20px; padding-bottom:20px; }
+.storefront-theme .site-header .logo { letter-spacing:normal; }
+.store-announcement { background:#18191b; color:#d7c9b2; border-bottom:1px solid #353638; }
+.storefront-theme .site-footer { background:#090a0c; border-color:#353638; }
+.storefront-theme .site-footer .logo { background:transparent; padding:0; }
+.storefront-theme .site-footer .aurk-wordmark { font-size:38px; }
+.storefront-theme .site-footer p,.storefront-theme .site-footer nav a,.storefront-theme .footer-bottom { color:#bbb6ad; }
+.storefront-theme .site-footer nav a:hover { color:#f2ede4; }
+.storefront-theme .commerce-page input,.storefront-theme .commerce-page select,.storefront-theme .commerce-page textarea,.storefront-theme .form-card input,.storefront-theme .shop-page input,.storefront-theme .shop-page select,.storefront-theme .quick-add input,.storefront-theme .quick-add select,.storefront-theme .separate-variant-fields select { background:#1b1c1f; color:#f2ede4; border-color:#65625c; }
+.storefront-theme .commerce-page .delivery-grid input { background:#1b1c1f; border-color:#65625c; }
+.storefront-theme .button,.storefront-theme .commerce-page .button { background:#d7bd91; color:#15120e; border-color:#d7bd91; }
+.storefront-theme .button:hover,.storefront-theme .commerce-page .button:hover { background:#eed8b4; color:#15120e; border-color:#eed8b4; box-shadow:0 8px 28px #0005; }
+.storefront-theme :focus-visible { outline:2px solid #e3c799; outline-offset:4px; }
+.storefront-theme ::selection { color:#101113; background:#d7bd91; }
+.storefront-theme .storefront-hero h1 span { color:#d7bd91; }
+.storefront-theme .hero-wordmark { background:radial-gradient(ellipse at 50% 35%,#51432c,#171819 65%); color:#e6d2af; font-size:clamp(36px,6vw,90px); letter-spacing:.09em; }
+.storefront-theme .storefront-hero-feature { box-shadow:0 24px 65px #0006; border:1px solid #383633; }
+.storefront-theme .hero-feature-caption { color:#fff; }
+.storefront-theme .home-product-card,.storefront-theme .product-card { background:#151618; border:1px solid #353638; border-radius:6px; overflow:hidden; }
+.storefront-theme .home-product-meta { padding:20px; }
+.storefront-theme .home-product-image,.storefront-theme .product-card-image,.storefront-theme .shopping-main-image,.storefront-theme .shopping-thumbnails .product-thumbnail { background:#ecebe8; }
+.storefront-theme .home-product-image img,.storefront-theme .product-card-image img { filter:none; }
+.storefront-theme .home-image-empty,.storefront-theme .shopping-image-empty { background:#202124; color:#d7bd91; }
+.storefront-theme .quantity-stepper button,.storefront-theme .size-option { background:#242527; color:#f2ede4; border-color:#62605a; }
+.storefront-theme .size-option[aria-pressed="true"] { background:#d7bd91; color:#15120e; border-color:#d7bd91; box-shadow:0 0 0 2px #806c4e; }
+.storefront-theme input,.storefront-theme select,.storefront-theme textarea { color-scheme:dark; }
+.storefront-theme input::placeholder,.storefront-theme textarea::placeholder { color:#aaa59e; opacity:1; }
+.storefront-theme .flash.error { color:#ffb9ae; background:#301e1c; border-color:#87594f; }
+.storefront-theme .stock-warning { color:#f0bc8d; }
+.storefront-theme .storefront-hero-copy { animation:aurk-enter .8s ease-out both; }
+@keyframes aurk-enter { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+/* Keep the existing admin controls readable while adopting the new wordmark. */
+.admin-app { color-scheme:light; }
+.admin-app .aurk-wordmark { color:#191919; font-size:28px; margin:14px 0; }
+@media(max-width:700px) { .aurk-wordmark { font-size:25px; } .storefront-theme .site-header { min-height:78px; } .storefront-theme .home-product-meta { padding:14px; } }
+@media(prefers-reduced-motion:reduce) { .storefront-theme .storefront-hero-copy { animation:none; } }
+
+/* Campaign homepage, inspired by the supplied editorial reference. */
+.aurk-topline { display:flex; justify-content:space-between; gap:20px; padding:12px 3%; background:#080808; border-bottom:1px solid #2d2d2d; color:#bcbcbc; font-size:10px; letter-spacing:.35em; }
+.storefront-theme .aurk-editorial-header { display:grid; grid-template-columns:1fr auto 1fr; min-height:112px; padding:20px 3%; background:#080808; border-bottom:0; }
+.aurk-logo-lockup { display:flex; flex-direction:column; align-items:center; }
+.aurk-logo-lockup small { font-size:9px; letter-spacing:.45em; margin-top:5px; color:#ccc; }
+.storefront-theme .aurk-editorial-header .logo { grid-column:2; grid-row:1; justify-self:center; }
+.storefront-theme .aurk-editorial-header .aurk-wordmark { font-size:48px; font-weight:500; letter-spacing:.15em; line-height:1; }
+.aurk-custom-logo { display:block; width:240px; height:72px; object-fit:contain; }
+.storefront-theme .aurk-editorial-header nav { grid-column:1; grid-row:1; justify-content:flex-start; gap:26px; }
+.storefront-theme .aurk-editorial-header nav a { color:#eee; text-transform:uppercase; font-size:12px; letter-spacing:.18em; }
+.aurk-header-actions { grid-column:3; grid-row:1; display:flex; align-items:center; justify-content:flex-end; gap:20px; }
+.aurk-header-actions a { display:flex; align-items:center; justify-content:center; min-width:44px; min-height:44px; }
+.aurk-header-actions svg { width:23px; height:23px; fill:none; stroke:currentColor; stroke-width:1.2; }
+.aurk-header-actions button { font-size:12px!important; }
+.storefront-theme .aurk-campaign { position:relative; isolation:isolate; max-width:none; width:100%; min-height:510px; height:min(70vh,760px); margin:0; padding:65px 5.4%; display:flex; align-items:center; overflow:hidden; background:radial-gradient(ellipse at 70% 35%,#393834,#111 70%); color:#fff; }
+.aurk-campaign-image,.aurk-campaign-shade { position:absolute; inset:0; z-index:-2; }
+.aurk-campaign-image img { display:block; width:100%; height:100%; object-fit:cover; object-position:65% center; }
+.aurk-campaign-image video:not([hidden]) { position:absolute; inset:0; display:block; width:100%; height:100%; object-fit:cover; object-position:center; }
+.aurk-campaign-shade { z-index:-1; background:linear-gradient(90deg,#000e 0%,#000b 28%,#0002 65%),linear-gradient(0deg,#0009,transparent 30%); }
+.aurk-campaign-copy { max-width:650px; padding-bottom:35px; animation:aurk-enter .8s ease-out both; }
+.aurk-campaign-copy p { font-size:12px; letter-spacing:.36em; margin:0 0 16px; color:#eee; }
+.aurk-campaign-copy h1 { font-size:clamp(44px,4.6vw,82px); line-height:1.12; font-weight:400; letter-spacing:.2em; margin:12px 0 20px; color:#eee; }
+.storefront-theme .aurk-campaign .button { margin-top:12px; border-radius:0; background:#f5f5f3; border-color:#f5f5f3; color:#101010; min-width:195px; gap:25px; font-size:12px; letter-spacing:.25em; }
+.storefront-theme .aurk-campaign .button:hover { background:#d7bd91; border-color:#d7bd91; }
+.aurk-campaign-side { position:absolute; right:3%; top:22%; color:#eee; font-size:11px; line-height:2.2; letter-spacing:.35em; }
+.aurk-campaign-side:before { content:""; display:block; width:40px; height:1px; margin-bottom:18px; background:#aaa; }
+.aurk-campaign-bottom { position:absolute; bottom:30px; left:3%; right:3%; display:flex; justify-content:space-between; gap:20px; font-size:10px; letter-spacing:.3em; }
+.aurk-campaign-bottom span { display:flex; align-items:center; gap:18px; }
+.aurk-campaign-bottom span:before { content:""; width:40px; height:1px; background:#bbb; }
+.admin-app .aurk-custom-logo { background:#111; padding:12px; border-radius:4px; max-width:100%; }
+.admin-app .aurk-logo-lockup small { color:#555; }
+@media(max-width:1100px) { .storefront-theme .aurk-editorial-header nav { gap:14px; } .storefront-theme .aurk-editorial-header nav a { font-size:10px; } .aurk-header-actions { gap:8px; } .aurk-custom-logo { width:190px; } }
+@media(max-width:700px) {
+ .aurk-topline { justify-content:center; font-size:9px; letter-spacing:.18em; } .aurk-topline span:not(:first-child) { display:none; }
+ .storefront-theme .aurk-editorial-header { min-height:90px; grid-template-columns:1fr auto 1fr; padding:12px 4%; gap:8px; }
+ .storefront-theme .aurk-editorial-header .aurk-wordmark { font-size:26px; } .aurk-logo-lockup small { font-size:7px; letter-spacing:.2em; }
+ .aurk-custom-logo { width:125px; height:50px; }
+ .storefront-theme .aurk-editorial-header .site-menu-toggle { grid-row:1; grid-column:1; justify-self:start; }
+ .storefront-theme .aurk-editorial-header nav { grid-row:2; grid-column:1/-1; width:100%; flex-wrap:wrap; justify-content:center; }
+ .aurk-header-actions { gap:0; } .aurk-header-actions a { min-width:34px; } .aurk-header-actions svg { width:20px; }
+ .aurk-header-actions { flex-wrap:wrap; max-width:110px; } .aurk-header-actions form { flex-basis:100%; text-align:right; } .aurk-header-actions button { font-size:10px!important; padding:2px 0; }
+ .storefront-theme .aurk-campaign { height:650px; min-height:550px; max-height:85svh; padding:40px 6%; align-items:flex-end; }
+ .aurk-campaign-image img { object-position:65% center; }
+ .aurk-campaign-shade { background:linear-gradient(0deg,#000f,#0009 45%,#0001); }
+ .aurk-campaign-copy { padding-bottom:45px; } .aurk-campaign-copy h1 { font-size:clamp(36px,9vw,60px); letter-spacing:.14em; }
+ .aurk-campaign-copy p { font-size:10px; letter-spacing:.2em; } .aurk-campaign-side { display:none; }
+ .aurk-campaign-bottom { bottom:22px; font-size:8px; letter-spacing:.13em; } .aurk-campaign-bottom span:before { width:18px; }
+}
+@media(prefers-reduced-motion:reduce) { .aurk-campaign-copy { animation:none; } }
+
+/* Original supplied artwork: crop only the presentation, preserving the lettering. */
+.aurk-artwork-square { display:block; position:relative; width:260px; aspect-ratio:3.5; overflow:hidden; background:#000; }
+.aurk-artwork-square .aurk-custom-logo,.admin-app .aurk-artwork-square .aurk-custom-logo { position:absolute; width:125%; max-width:none; height:auto; left:-12.5%; top:-194%; padding:0; border-radius:0; }
+.storefront-theme .site-footer .aurk-artwork-square { width:180px; aspect-ratio:1; }
+.storefront-theme .site-footer .aurk-artwork-square .aurk-custom-logo { position:static; width:100%; height:auto; }
+.admin-app .aurk-artwork-square { width:190px; }
+/* Blend the JPEG's black canvas into the surrounding dark navigation. */
+.storefront-theme .aurk-editorial-header { transition:transform .24s ease; }
+.storefront-theme .aurk-editorial-header[data-concealed="true"] { transform:translateY(calc(-100% - 2px)); pointer-events:none; }
+.storefront-theme .aurk-editorial-header:focus-within { transform:none; pointer-events:auto; }
+.aurk-nav-reveal { position:fixed; inset:0 0 auto; height:20px; width:100%; z-index:30; border:0; padding:0; background:transparent; color:transparent; cursor:pointer; }
+.aurk-nav-reveal[hidden] { display:none; }
+.aurk-nav-reveal:focus-visible { height:44px; background:#080808; color:white; }
+@media(hover:none) { .aurk-nav-reveal { inset:8px 12px auto auto; width:auto; height:40px; padding:0 14px; background:#080808; color:white; border:1px solid #555; border-radius:4px; } }
+.storefront-theme .aurk-editorial-header .logo { isolation:isolate; background:#080808; }
+.storefront-theme .aurk-editorial-header .aurk-artwork-square { background:transparent; }
+.storefront-theme .aurk-editorial-header .aurk-custom-logo { mix-blend-mode:screen; }
+.storefront-theme .aurk-campaign { height:auto; min-height:470px; aspect-ratio:2073/759; }
+.aurk-campaign-shade { background:linear-gradient(90deg,#0007,transparent 65%),linear-gradient(0deg,#0005,transparent 22%); }
+@media(max-width:700px) {
+ .aurk-artwork-square { width:130px; }
+ .storefront-theme .aurk-campaign { aspect-ratio:auto; height:650px; min-height:550px; }
+ .aurk-campaign-shade { background:linear-gradient(0deg,#000f,#0009 40%,#0001 80%); }
+ .aurk-campaign-image img { object-position:68% center; }
+}
+
+/* Availability subdues only the visual area, preserving readable details. */
+.availability-visual { position: relative; overflow: hidden; isolation: isolate; }
+.availability-visual img { filter: blur(4px) brightness(.65); }
+.availability-visual::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg,transparent,rgba(0,0,0,.3)); pointer-events: none; z-index: 1; }
+.availability-badge { position: absolute; z-index: 2; left: 50%; top: 50%; transform: translate(-50%,-50%); padding: .8rem 1rem; border: 1px solid rgba(255,255,255,.6); background: rgba(15,15,15,.8); color: #fff; font-size: .75rem; font-weight: 700; letter-spacing: .12em; text-align: center; width: max-content; max-width: 90%; pointer-events: none; }
+.product-interest { margin-top: 1rem; }
+.product-interest .interest-button { min-height: 48px; width: 100%; white-space: normal; }
+.interest-button:disabled { opacity: .7; cursor: default; }
+.interest-message { font-size: .85rem; line-height: 1.5; margin-top: .6rem; }

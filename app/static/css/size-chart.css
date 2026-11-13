@@ -1,0 +1,23 @@
+.storefront-theme button.size-chart-trigger{display:block;width:auto;margin:8px 0 4px auto;padding:5px 0;min-height:36px;border:0;border-radius:0;background:transparent;color:inherit;font:inherit;font-size:13px;text-decoration:underline;text-underline-offset:4px;cursor:pointer}
+.size-chart-dialog{width:min(1040px,calc(100% - 24px));max-width:1040px;max-height:90svh;padding:0;border:0;border-radius:8px;background:#fff;color:#18232a;overflow:auto;overscroll-behavior:contain}
+.size-chart-dialog::backdrop{background:#000b}
+.size-chart-hint{margin:16px 24px 0;font-size:13px;color:#00676c}
+html.size-chart-open{overflow:hidden}
+.size-chart-heading{display:flex;justify-content:space-between;align-items:start;gap:16px;padding:24px;position:sticky;top:0;background:#fff;z-index:1;border-bottom:1px solid #dce5e5}
+.size-chart-heading h2{margin:0;font-size:clamp(22px,4vw,32px);color:#18232a}
+.size-chart-heading p{margin:4px 0 0}
+.size-chart-heading button{width:44px;height:44px;flex-shrink:0;border:1px solid #c7d7d7;border-radius:4px;background:#fff;color:#18232a;font-size:28px;cursor:pointer}
+.size-chart-scroll{overflow:auto;margin:20px 24px}
+.size-chart-dialog table{width:100%;min-width:660px;border-collapse:collapse;font-size:16px;text-align:center}
+.size-chart-dialog caption{text-align:left;margin-bottom:12px;font-size:14px}
+.size-chart-dialog th,.size-chart-dialog td{padding:12px 14px;border:1px solid #e0e9e9;white-space:nowrap}
+.size-chart-dialog thead th{background:#006c70;color:#fff}
+.size-chart-dialog tbody th{font-weight:600}
+.size-chart-dialog tbody tr:nth-child(even){background:#e9f2f2}
+.size-chart-instructions{padding:0 24px 24px;line-height:1.6}
+.size-chart-instructions h3{color:#00676c;font-size:22px;margin:12px 0}
+.size-chart-instructions dl{display:grid;grid-template-columns:auto 1fr;gap:6px 12px}
+.size-chart-instructions dt{font-weight:700;color:#00676c}.size-chart-instructions dd{margin:0}
+.size-chart-instructions a{color:#00676c;text-decoration:underline}
+.size-chart-dialog :focus-visible,.size-chart-trigger:focus-visible{outline:2px solid #00858a;outline-offset:3px}
+@media(max-width:600px){.size-chart-heading{padding:16px}.size-chart-scroll{margin:16px}.size-chart-instructions{padding:0 16px 20px}.size-chart-instructions dl{grid-template-columns:1fr;gap:0}.size-chart-instructions dd{margin-bottom:8px}}

@@ -1,0 +1,16 @@
+{% if not owner_view %}<p><a class="button" href="{{ url_for('orders.download_bill', order_number=order.order_number) }}">Download bill PDF</a></p>{% endif %}
+<div class="order-status-panel" {% if not owner_view %}data-order-status-url="{{ url_for('orders.status', order_number=order.order_number) }}"{% endif %}>
+  <span class="status-badge" data-status-label>{{ order.status_label }}</span>
+  <h2 data-status-message>{{ order.status_message }}</h2>
+  <p class="muted">Cash on delivery &middot; Order total: &#8377;{{ '%.2f'|format(order.total) }}</p>
+</div>
+{% if order.shipment and order.shipment.awb %}<section class="commerce-card"><h2>Track your parcel</h2><p>{{ order.shipment.courier }} tracking number: <strong>{{ order.shipment.awb }}</strong></p><p>{{ order.shipment.status }}</p><a href="https://www.dtdc.com/track-your-shipment/" target="_blank" rel="noopener noreferrer">Track on DTDC</a><p class="muted">Enter the tracking number on DTDC's website.</p></section>{% endif %}
+<div class="checkout-layout">
+  <div class="commerce-card"><h2>Your items</h2>{% for item in order.items %}<div class="order-item-row"><div><strong>{{ item.product_name_snapshot }}</strong><small>{{ item.size_snapshot }} / {{ item.color_snapshot }} &middot; Qty {{ item.quantity }}</small></div><strong>₹{{ '%.2f'|format(item.line_total) }}</strong></div>{% endfor %}
+  <div class="summary-line"><span>Subtotal</span><span>₹{{ '%.2f'|format(order.subtotal) }}</span></div>
+  <div class="summary-line"><span>Delivery</span><span>₹{{ '%.2f'|format(order.shipping) }}</span></div>
+  {% if order.discount %}<div class="summary-line"><span>Discount</span><span>−₹{{ '%.2f'|format(order.discount) }}</span></div>{% endif %}
+  {% if order.tax %}<div class="summary-line"><span>Tax</span><span>₹{{ '%.2f'|format(order.tax) }}</span></div>{% endif %}
+  <div class="summary-line summary-total"><strong>Total</strong><strong>₹{{ '%.2f'|format(order.total) }}</strong></div></div>
+  <aside class="commerce-card"><h2>Deliver to</h2><address><strong>{{ order.shipping_name }}</strong><br>{{ order.shipping_line1 }}<br>{% if order.shipping_line2 %}{{ order.shipping_line2 }}<br>{% endif %}{{ order.shipping_city }}, {{ order.shipping_state }} {{ order.shipping_postal_code }}<br>{{ order.shipping_country }}</address><p>Phone: {% if owner_view %}<a href="tel:{{ order.shipping_phone }}">{{ order.shipping_phone }}</a>{% else %}{{ order.shipping_phone }}{% endif %}</p></aside>
+</div>

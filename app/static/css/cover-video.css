@@ -1,0 +1,70 @@
+/* Use the supplied 8:3 landscape and 9:16 mobile films to fill the hero. */
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+  .storefront-theme :is(.button, .home-collections > a) {
+    transition: transform 220ms ease, background-color 220ms ease, color 220ms ease;
+  }
+  @media (hover: hover) {
+    .storefront-theme :is(.button, .home-collections > a):hover { transform: translateY(-2px); }
+  }
+}
+.storefront-theme #collections { scroll-margin-top: 110px; }
+.storefront-theme .aurk-campaign {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  overflow: hidden;
+  height: 100svh;
+  min-height: 520px;
+  max-height: none;
+  aspect-ratio: auto;
+  padding: clamp(32px, 5vw, 72px) var(--page-gutter, 6%);
+  background: #111;
+}
+.storefront-theme .aurk-campaign-image {
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+.storefront-theme .aurk-campaign-image video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
+}
+.storefront-theme .aurk-campaign-shade {
+  background: linear-gradient(90deg, #0009, #0003 50%, transparent 80%),
+              linear-gradient(0deg, #0007, transparent 35%);
+}
+@media (max-width: 760px) {
+  .storefront-theme .aurk-campaign {
+    height: 100svh;
+    min-height: 460px;
+    padding: 28px var(--page-gutter, 20px);
+    align-items: flex-end;
+  }
+  .storefront-theme .aurk-campaign-shade {
+    background: linear-gradient(0deg, #000c, #0005 45%, #0001 80%);
+  }
+  .storefront-theme .aurk-campaign-copy { padding-bottom: 42px; }
+  .storefront-theme .aurk-campaign-image video { object-position: center; }
+}
+
+.cover-pause { position:absolute; right:24px; bottom:60px; z-index:4; min-height:44px; padding:10px 14px; border:1px solid #fff; background:#111d; color:#fff; border-radius:4px; font:inherit; cursor:pointer; }
+.cover-pause:focus-visible { outline:3px solid #fff; outline-offset:4px; }
+@media(max-width:760px) { .cover-pause { top:16px; bottom:auto; right:16px; font-size:12px; } }
+
+/* Keep campaign text above both the video and its shading layer. */
+.storefront-theme .aurk-campaign-copy { position:relative; z-index:1; }

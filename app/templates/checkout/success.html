@@ -1,0 +1,3 @@
+{% extends 'base.html' %}
+{% block title %}Order received — AURK{% endblock %}
+{% block content %}<section class="container commerce-page"><div class="commerce-heading"><p class="eyebrow">THANK YOU FOR SHOPPING AURK</p><h1>Your order is in.</h1><p>Order {{ order.order_number }}</p></div>{% include 'account/_order_content.html' %}<div class="commerce-actions"><a class="button" href="{{ url_for('orders.detail', order_number=order.order_number) }}">Track your order</a><a class="subtle-link" href="{{ url_for('products.shop') }}">Keep exploring</a></div></section>{% endblock %}

@@ -1,0 +1,41 @@
+{% extends 'admin/base.html' %}
+{% from 'admin/_components.html' import heading,csrf with context %}
+{% block title %}Storefront{% endblock %}
+{% block content %}
+{{ heading('CONTENT & CAMPAIGNS','Storefront','Manage your homepage cover, promotional banners and scrolling announcements.') }}
+{% if error %}<p class="alert-error" role="alert">{{ error }} Your changes were not saved. Choose files again before retrying.</p>{% endif %}
+<p>Saving publishes these changes to this website immediately. <a href="{{ url_for('main.home') }}" target="_blank" rel="noopener">View store &nearr;</a></p>
+<form method="post" enctype="multipart/form-data">{{ csrf() }}
+<section class="panel form-panel"><h2>Cover video</h2>
+<label class="check-label"><input type="checkbox" name="cover_enabled" value="1" {% if content.cover_enabled %}checked{% endif %}> Show homepage cover</label>
+<p class="muted">The cover fills the screen height and width. Video fills this area and may crop at the edges; keep important subjects central. Banners appear in their own section with a gap below the cover.</p>
+<p class="muted">Add up to two cover videos. Each plays to completion, then slides to the next; after video 2, video 1 plays again. A single video loops. MP4 up to 25 MB each; H.264 recommended. Playback is muted. Optional mobile versions replace the corresponding desktop video on phones. Video 2 needs its desktop upload to join the sequence. Removing video 1 restores the original cover. Reduced motion uses manual playback. Cover text stays the same across both videos.</p>
+{% for field,label in [('desktop_video','Video 1 — desktop'),('mobile_video','Video 1 — mobile (optional)'),('second_desktop_video','Video 2 — desktop (optional)'),('second_mobile_video','Video 2 — mobile (optional)'),('poster','Poster / loading image')] %}
+<label>{{ label }}<input type="file" name="{{ field }}" accept="{{ 'video/mp4' if field.endswith('video') else 'image/jpeg,image/png,image/webp' }}"></label>
+{% if content[field] %}<p><a href="{{ url_for('main.storefront_media', key=content[field]) }}" target="_blank" rel="noopener">View current {{ label|lower }}</a></p><label class="check-label"><input type="checkbox" name="remove_{{ field }}" value="1"> Remove current {{ label|lower }}</label>{% endif %}
+{% endfor %}
+<label>Headline (line breaks supported)<textarea name="cover_title" maxlength="100" rows="2">{{ content.cover_title }}</textarea></label>
+<label>Subtitle<input name="cover_subtitle" maxlength="200" value="{{ content.cover_subtitle }}"></label>
+<div class="form-grid"><label>Button text (blank to hide)<input name="cover_button" maxlength="40" value="{{ content.cover_button }}"></label><label>Button link<input name="cover_link" required value="{{ content.cover_link }}" placeholder="/shop"></label></div>
+</section>
+<section class="panel form-panel"><h2>Scrolling discount / announcement bar</h2>
+<label class="check-label"><input type="checkbox" name="bar_enabled" value="1" {% if content.bar_enabled %}checked{% endif %}> Show announcement bar across the storefront</label>
+<label>Messages (one per line)<textarea name="bar_messages" maxlength="1000" rows="4" placeholder="New collection now live&#10;Free delivery across India">{{ content.bar_messages }}</textarea></label>
+<div class="form-grid"><label>Announcement link<input name="bar_link" required value="{{ content.bar_link }}" placeholder="/shop"></label><label>Scroll speed<select name="bar_speed">{% for speed in ['slow','normal','fast'] %}<option value="{{ speed }}" {% if content.bar_speed == speed %}selected{% endif %}>{{ speed|capitalize }}</option>{% endfor %}</select></label></div>
+<p class="muted">Promotional text only. This does not create discounts, apply coupons or change checkout prices. Scrolling pauses on hover or keyboard focus; no pause/resume button is shown.</p>
+</section>
+{% for banner in content.banners %}{% set prefix = 'banner_' ~ loop.index0 ~ '_' %}
+<section class="panel form-panel"><h2>Banner {{ loop.index }}</h2>
+<label class="check-label"><input type="checkbox" name="{{ prefix }}enabled" value="1" {% if banner.enabled %}checked{% endif %}> Include this banner in the homepage carousel below the cover</label>
+<label>Image<input type="file" name="{{ prefix }}image" accept="image/jpeg,image/png,image/webp"></label>
+<p class="muted">Recommended size: <strong>1920 &times; 640 pixels (3:1)</strong>. Displayed edge to edge across the website, scaling to screen width. Use the same ratio for all banners; other ratios have space around them so the whole image stays visible. Keep text large and central for phones. JPG, PNG or WEBP; up to 8 MB and 20 megapixels.</p>
+<p class="muted">Enabled banners form one carousel, in banner-number order. It advances every 5 seconds and pauses on mouse hover, keyboard focus, or touch interaction. Visitors can swipe or use keyboard arrow keys; no navigation or pause buttons are displayed. Reduced-motion preferences disable automatic advancement. A single banner stays still.</p>
+{% if banner.image %}<p><a href="{{ url_for('main.storefront_media', key=banner.image) }}" target="_blank" rel="noopener">View current image</a></p><label class="check-label"><input type="checkbox" name="{{ prefix }}remove" value="1"> Remove current image</label>{% endif %}
+<label>Heading (optional)<input name="{{ prefix }}title" maxlength="100" value="{{ banner.title }}"></label>
+<label>Alternative text (required when enabled)<input name="{{ prefix }}alt" maxlength="200" value="{{ banner.alt }}"></label>
+<label>Link<input name="{{ prefix }}link" required value="{{ banner.link }}" placeholder="/shop"></label>
+</section>{% endfor %}
+<p>Links must start with a single / and point to a page on this store. Keep the combined upload below 100 MB, or save files in separate updates.</p>
+<button type="submit">Save storefront</button>
+</form>
+{% endblock %}

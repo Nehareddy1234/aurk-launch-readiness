@@ -1,0 +1,66 @@
+.storefront-theme .product-interest .notify-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  overflow: hidden;
+  isolation: isolate;
+  box-sizing: border-box;
+  background: #f5f3ee;
+  color: #111;
+  border: 1px solid #f5f3ee;
+  border-radius: 4px;
+  font-weight: 700;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+
+/* A quiet launch signal, shared by product cards and the detail gallery. */
+.storefront-theme .coming-soon-badge {
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  padding:12px 18px;border:1px solid #dac39899;border-radius:999px;
+  background:linear-gradient(135deg,#171a1df5,#28231df2);color:#f4dfb8;
+  box-shadow:0 6px 24px #0005,inset 0 1px 0 #ffffff12;
+  font-size:11px;font-weight:600;line-height:1.4;letter-spacing:.16em;
+  overflow:hidden;isolation:isolate;white-space:nowrap;
+}
+.coming-soon-badge::after {
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(110deg,transparent 30%,#fff1 48%,#f6dfb833 50%,transparent 70%);
+  transform:translateX(-150%);animation:coming-soon-sheen 6s ease-in-out infinite;
+}
+.coming-soon-dot {
+  width:6px;height:6px;flex:0 0 6px;border-radius:50%;background:#e4c491;
+  box-shadow:0 0 0 3px #e4c49118;animation:coming-soon-pulse 3s ease-in-out infinite;
+}
+@keyframes coming-soon-sheen {0%,65%{transform:translateX(-150%)}100%{transform:translateX(150%)}}
+@keyframes coming-soon-pulse {0%,100%{opacity:.7;box-shadow:0 0 0 3px #e4c49118}50%{opacity:1;box-shadow:0 0 0 6px #e4c49108}}
+@media(max-width:600px){.storefront-theme .coming-soon-badge{font-size:10px;padding:10px 13px;gap:8px;letter-spacing:.1em}}
+@media(prefers-reduced-motion:reduce){.coming-soon-badge::after{animation:none;display:none}.coming-soon-dot{animation:none}}
+.notify-button::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(110deg, transparent 25%, #b9b4a650 50%, transparent 75%);
+  transform: translateX(-150%);
+  animation: notify-shimmer 5s ease-in-out infinite;
+}
+.storefront-theme .product-interest .notify-button:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px #ffffff20;
+}
+.notify-button:focus-visible { outline: 2px solid #d7bd91; outline-offset: 4px; }
+.notify-button:disabled::after { animation: none; display: none; }
+@keyframes notify-shimmer {
+  0%, 65% { transform: translateX(-150%); }
+  100% { transform: translateX(150%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .notify-button::after { animation: none; display: none; }
+  .storefront-theme .product-interest .notify-button { transition: none; }
+  .storefront-theme .product-interest .notify-button:not(:disabled):hover { transform: none; }
+}

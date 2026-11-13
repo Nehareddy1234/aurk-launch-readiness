@@ -1,0 +1,15 @@
+Hey {{ first_name }},
+
+Thanks for showing interest in {{ product_name }}.
+
+We've saved your request. We will update you when the drop is live.
+
+This is a notification request, not an order or reservation.
+View the drop: {{ product_url }}
+
+Need a hand? Write to {{ support_email }}.
+
+Team AURK
+
+You received this email because you clicked Notify me for this AURK product.
+This is an automated message from an unmonitored address.

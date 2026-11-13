@@ -1,0 +1,10 @@
+{% if product.product_status != 'available' %}{% include 'shop/_interest.html' %}{% else %}
+{% set options = namespace(items=[]) %}
+{% for variant in product.variants %}{% if variant.is_active and variant.inventory and variant.inventory.quantity > variant.inventory.reserved_quantity %}{% set options.items = options.items + [variant] %}{% endif %}{% endfor %}
+{% if options.items %}<details class="card-options"><summary>Choose options <span aria-hidden="true">+</span></summary><form class="quick-add" method="post" action="{{ url_for('cart.add') }}" data-quick-add>
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+{% include 'shop/_variant_fields.html' %}
+<div class="quick-add-action"><label>Qty<input name="quantity" type="number" min="1" max="99" value="1" required inputmode="numeric" aria-label="Quantity for {{ product.name }}"></label><button type="submit" class="button">Add to bag</button></div><p class="quick-add-note" data-quick-note aria-live="polite">Choose an option to add it straight to your bag.</p>
+</form></details>{% else %}<p class="quick-add-sold-out">Currently out of stock</p>{% endif %}
+
+{% endif %}

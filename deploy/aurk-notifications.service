@@ -1,0 +1,14 @@
+[Unit]
+Description=AURK queued customer and owner notifications
+After=network-online.target aurk.service
+OnFailure=aurk-alert@%n.service
+[Service]
+Type=oneshot
+User=ubuntu
+WorkingDirectory=/home/ubuntu/Aurk
+Environment=FLASK_CONFIG=production
+ExecStart=/home/ubuntu/Aurk/.venv/bin/python -m flask --app wsgi:app process-notifications
+TimeoutStartSec=15min
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full

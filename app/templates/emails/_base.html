@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><meta name="supported-color-schemes" content="dark"><title>{{ subject }}</title>
+<style>
+:root{color-scheme:dark;supported-color-schemes:dark}
+body,.aurk-background{background-color:#000000!important;background-image:linear-gradient(#000000,#000000)!important;color:#ffffff!important}
+table,td,p,h1,h2,strong,a,span{color:#ffffff}
+@media(prefers-color-scheme:dark){body,.aurk-background,table,td{background-color:#000000!important}p,h1,h2,h3,td,a,span,strong{color:#ffffff!important}}
+[data-ogsc] .aurk-background,[data-ogsb] .aurk-background{background-color:#000000!important;color:#ffffff!important}
+@media only screen and (max-width:600px){.email-pad{padding-left:22px!important;padding-right:22px!important}.email-title{font-size:36px!important}.email-shell{width:100%!important}.email-item{font-size:13px!important}}
+</style></head>
+<body class="aurk-background" bgcolor="#000000" style="margin:0;padding:0;background-color:#000000;background-image:linear-gradient(#000000,#000000);color:#ffffff;font-family:Arial,Helvetica,sans-serif;">
+<div style="display:none;font-size:1px;color:#ffffff;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;mso-hide:all;">{{ preheader|default('Your AURK account is ready. Find your fit and make it yours.') }}</div>
+<table class="aurk-background" role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#000000" style="background-color:#000000;background-image:linear-gradient(#000000,#000000);color:#ffffff;"><tr><td align="center" bgcolor="#000000" style="padding:28px 12px;background-color:#000000;color:#ffffff;">
+<table class="email-shell aurk-background" role="presentation" width="600" cellpadding="0" cellspacing="0" bgcolor="#000000" style="width:100%;max-width:600px;background-color:#000000;background-image:linear-gradient(#000000,#000000);color:#ffffff;border:1px solid #444444;">
+{% include 'emails/_brand_header.html' %}
+{% block email_content %}{% endblock %}
+<tr><td class="email-pad" bgcolor="#000000" style="padding:22px 40px;background-color:#000000;color:#ffffff;font-size:11px;line-height:1.9;">INDIAN / STREETWEAR<br><a href="{{ website_url }}" style="color:#ffffff;text-decoration:none;">aurk.in</a> &middot; <a href="mailto:{{ support_email }}" style="color:#ffffff;text-decoration:none;">Contact support</a></td></tr>
+</table><p style="max-width:540px;margin:20px 0 0;color:#ffffff;font-size:11px;line-height:1.8;">{% block delivery_note %}{% endblock %}</p>
+</td></tr></table></body></html>

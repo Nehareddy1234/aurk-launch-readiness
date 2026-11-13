@@ -1,0 +1,141 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>AURK remaining work before launch</title><style>body{margin:0;background:#f4f5f7;color:#17202b;font:16px/1.65 system-ui,-apple-system,Segoe UI,sans-serif}main{max-width:1100px;margin:32px auto;background:white;padding:40px 48px;border:1px solid #dde2e8;border-radius:12px}h1,h2,h3{line-height:1.2;color:#112840}h1{font-size:34px}h2{margin-top:2em;padding-top:.6em;border-top:1px solid #d9e1ea}h3{margin-top:1.6em}a{color:#075ca8}table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.5;margin:20px 0}th,td{padding:11px 12px;border:1px solid #d9e1ea;text-align:left;vertical-align:top;overflow-wrap:anywhere}th{background:#edf3f9}tr:nth-child(even){background:#fafbfd}pre{overflow:auto;padding:18px;background:#edf3f9;border-radius:6px}code{font-size:.9em}li{margin:.5em 0}.note{color:#536477;font-size:13px}@media(max-width:700px){main{margin:0;padding:24px 14px;border:0;border-radius:0}h1{font-size:27px}table{font-size:12px}td,th{padding:7px 5px}}@media print{body{background:white;font-size:10pt}main{max-width:none;margin:0;padding:0;border:0}h2{break-after:avoid}tr{break-inside:avoid}a{color:#17202b}pre{white-space:pre-wrap}}</style></head><body><main><h1>AURK remaining work before launch</h1>
+<p>Updated 13 November 2026. This is the current handover checklist for the client and technical team. The last live AWS inspection was on 6 November; server findings below must be rechecked before changes. No fresh live-server verification is implied by this document date.</p>
+<h2>Current decision</h2>
+<p><strong>The updated source is prepared and tested locally, but it has not been deployed or approved for unrestricted commercial launch.</strong> The existing public website runs an older release. The client has set a <strong>zero additional AWS spending budget</strong>. New instances, additional storage, snapshots, paid monitoring and other chargeable resources must not be created without a revised budget approval. Existing AWS charges are not made free by this restriction.</p>
+<h2>Completed work</h2>
+<ul>
+<li>Reconciled the storefront, account, admin, checkout and COD functionality; added business/delivery settings, search metadata, sitemap/feed support and responsive/accessibility improvements.</li>
+<li>Added migration safeguards, shared-limiter/readiness checks, bounded notification retries, queue monitoring, backup/restore utilities and deployment/rollback instructions.</li>
+<li>Prepared host disk checks and an operational failure-email service using the existing SMTP configuration. These are local templates only; they are not installed or configured on the server.</li>
+<li>Ran local backend/security/integration, browser and targeted MySQL checks. Live read-only checks found no broken references across 42 database relationships, no checked stock/order/payment inconsistencies, and all 55 referenced media files present.</li>
+<li>Prepared a source-only release process that excludes credentials, databases and customer uploads. The new Git repository contains the project source, tests, migrations, deployment templates and handover documents.</li>
+</ul>
+<p>Historical evidence: 316 Linux backend tests passed with four MySQL-only skips; 30 focused MySQL regressions passed; a synthetic MySQL/uploads restore passed after its fixture was corrected; 17 Chromium journey tests and 46 public route/asset checks passed. The full historical MySQL run timed out and is not a pass. Tests overlap and should not be added together as unique coverage. See the current verification record below for the latest source check.</p>
+<h2>Technical checklist</h2>
+<table>
+<thead>
+<tr>
+<th>Pending work</th>
+<th>Next action and completion evidence</th>
+<th>Owner</th>
+<th>Constraint or status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Refresh AWS access and inventory</td>
+<td>Sign in to the intended AWS account; verify instance, disk, runtime, schema and service state again.</td>
+<td>Client + technical team</td>
+<td>AWS session expired on 7 November. Do not assume the old session still works.</td>
+</tr>
+<tr>
+<td>Confirm a maintenance window</td>
+<td>Agree an IST window, maximum interruption and rollback contact before pausing writes, restarting services or changing DNS.</td>
+<td>Client</td>
+<td>Not supplied.</td>
+</tr>
+<tr>
+<td>Prove production recovery</td>
+<td>Back up the real SQL database and persistent uploads to a private off-server destination; verify checksum and restore in isolation. Preserve configuration securely.</td>
+<td>Technical team</td>
+<td>No recoverable store backup demonstrated in inspected AWS resources. An existing no-extra-cost destination/access plan is needed, or the budget must change. A local archive on the same server is insufficient.</td>
+</tr>
+<tr>
+<td>Resolve disk headroom</td>
+<td>Recheck storage usage and identify genuinely disposable files without deleting orders, uploads or recovery data. Meet the configured 2 GiB free-space reserve.</td>
+<td>Technical team</td>
+<td>Last observed: 8 GiB volume, 84% used, about 1.1 GiB free. No cleanup candidate or safe free-space recovery has been proven. Paid expansion is on hold.</td>
+</tr>
+<tr>
+<td>Protect storage and addressing</td>
+<td>Address unencrypted storage, delete-on-termination, disabled termination protection and the auto-assigned public IP through an approved plan.</td>
+<td>Technical team + client</td>
+<td>Last observed settings remain unremediated. Encryption replacement/snapshots and stable-IP changes may incur cost. Do not stop/start casually while DNS depends on the current IP.</td>
+</tr>
+<tr>
+<td>Isolated AWS transactional tests</td>
+<td>Test registration, checkout, last-item concurrency, duplicate submissions, cancellation/restocking, COD reconciliation and worker retries with synthetic data. Disable real provider actions.</td>
+<td>Technical team</td>
+<td>No full AWS-hosted test suite or isolated staging environment was created. New paid staging is on hold; prior local tests remain valid only for their stated scope.</td>
+</tr>
+<tr>
+<td>Configure runtime dependencies</td>
+<td>Install/configure private Redis and trusted proxy settings; validate the actual host-service configuration and locked dependencies.</td>
+<td>Technical team</td>
+<td>Redis/shared limiter was not verified live. Preparation can use the existing host only after capacity/recovery/maintenance gates are met.</td>
+</tr>
+<tr>
+<td>Deploy the new release</td>
+<td>Preserve <code>.env</code>, persistent uploads and the prior release. Rehearse and apply migrations from the observed <code>a1de49fa2387</code> through <code>b2ef50ab3498</code>, <code>c3fa61bc4509</code> and <code>d4ab72cd5610</code>. Install app/static/Nginx changes once.</td>
+<td>Technical team</td>
+<td>Not deployed. Never reset, seed, stamp or run test fixtures against the live database.</td>
+</tr>
+<tr>
+<td>Verify public endpoints</td>
+<td>Verify HTTPS and renewal, canonical-host redirect, <code>/api/ready</code>, <code>/robots.txt</code>, <code>/sitemap.xml</code>, <code>/merchant-feed.xml</code>, private-page access and media.</td>
+<td>Technical team</td>
+<td>The four new URLs returned 404; HTTPS www did not redirect to the chosen canonical host. Current live Nginx syntax passed, but the new template has not been installed.</td>
+</tr>
+<tr>
+<td>Hand over scheduled jobs</td>
+<td>Replace <code>aurk-customer-emails.timer</code> with the reviewed notification scheduler without overlap. Configure backup and health jobs; prove restart behavior.</td>
+<td>Technical team</td>
+<td>New notification/backup/health/alert units are not installed. Review the daily backup downtime before enabling its timer.</td>
+</tr>
+<tr>
+<td>Activate alerts and monitoring</td>
+<td>Confirm a monitored inbox and permission for controlled test emails. Install the failure-alert template, verify one-hour suppression, and prove a failure reaches a human. Add an approved external uptime check for whole-host/network loss.</td>
+<td>Client + technical team</td>
+<td>Recipient/send permission not supplied. Existing-host email alerts depend on that host and SMTP being alive; they do not replace independent monitoring. No paid monitor may be added under the current budget.</td>
+</tr>
+<tr>
+<td>Final operational acceptance</td>
+<td>Complete the approved live COD lifecycle and recovery/email/device checks, record results and client sign-off.</td>
+<td>Client + technical team</td>
+<td>Not complete. A passing read-only data audit cannot prove all write workflows or inbox delivery.</td>
+</tr>
+</tbody>
+</table>
+<h2>Client information still required</h2>
+<ul>
+<li>[ ] Legal business name, business address and return address.</li>
+<li>[ ] Grievance-contact name and email; confirm monitored customer support.</li>
+<li>[ ] GST registration status and GSTIN if applicable; confirm invoice/receipt wording.</li>
+<li>[ ] Verified DTDC COD PIN coverage, or an approved per-order manual coverage process.</li>
+<li>[ ] Confirm dispatch times, shipping charges, tracking, failed delivery/RTO, cancellation and return/refund promises.</li>
+<li>[ ] Review the five active QA-marked products and approve archiving appropriate test listings while preserving order history. Confirm genuine products, stock and prices.</li>
+<li>[ ] Alert and controlled test inboxes, with explicit permission to send test messages.</li>
+<li>[ ] Maintenance window and operational owners. Supply account access through secure sign-in; do not commit passwords or keys.</li>
+</ul>
+<h2>Verification still needed with real providers and devices</h2>
+<ul>
+<li>[ ] Actual inbox arrival for registration/recovery, receipts/status messages and owner alerts; verify sender-domain authentication. SMTP acceptance alone is not proof of delivery.</li>
+<li>[ ] Approved test order through confirmation, shipment/tracking, delivery and COD reconciliation, plus cancellation/restocking and the agreed return flow.</li>
+<li>[ ] Supported real phones/browsers, slow connectivity and owner fulfilment review.</li>
+<li>[ ] Successful production-backup restore and an acknowledged outage/queue/backup alert.</li>
+<li>[ ] Validate the selected production hosting route. Docker builds and remote CI execution have not been certified; Docker is optional for the existing host-service route.</li>
+</ul>
+<h2>Google and optional integrations</h2>
+<p>Google account access and submission remain separately deferred. After the site is ready, choose the correct Google account, verify Search Console and submit the sitemap if desired. Google submission is not required for direct visitors and does not guarantee indexing. Google sign-in, Merchant Center, analytics, advertising and online payments are separate choices; COD does not require an online payment gateway.</p>
+<h2>Current source verification</h2>
+<p><strong>13 November 2026:</strong> the full Linux backend/security/integration suite passed with <strong>330 passed, 5 skipped</strong>, on the isolated Python 3.14 environment. The skipped cases need MySQL/client tools. Four existing SQLAlchemy Query.get deprecation warnings remain maintenance items. Focused Windows alert/archive/runtime checks passed with <strong>36 passed, 1 MySQL-only skip</strong> outside the restricted sandbox. An earlier sandbox run hit file-rename permission errors; it was superseded by this successful focused run. No real email or production data was used. Browser and live AWS checks were not rerun on 13 November. See <a href="docs/VERIFICATION_20261113.md">verification notes</a>.</p>
+<h2>Release order</h2>
+<ol>
+<li>Restore AWS access and confirm maintenance, inbox and cost constraints.</li>
+<li>Secure and prove recovery; resolve safe storage headroom and infrastructure protection.</li>
+<li>Rehearse the new release and transactional tests in an isolated environment within the approved budget.</li>
+<li>Deploy during the approved window, preserving rollback and data.</li>
+<li>Verify endpoints, jobs, human alerts, email delivery and the complete COD workflow.</li>
+<li>Complete owner disclosures and supported-device acceptance, then record launch approval.</li>
+</ol>
+<p>The client may supply business information in parallel. <strong>Do not mark launch approved while an applicable recovery, security, business or acceptance gate remains unresolved.</strong></p>
+<h2>Related documents</h2>
+<ul>
+<li><a href="AURK_READINESS_REPORT.md">Detailed readiness assessment</a> - historical findings and both supplied Instagram checklists.</li>
+<li><a href="AWS_BACKEND_DATA_TEST_REPORT.md">AWS backend and data audit</a> - read-only live results and their limits.</li>
+<li><a href="DEPLOYMENT.md">Deployment runbook</a> - configuration, migration, backup and rollback procedure.</li>
+<li><a href="WEBSITE_DEPLOYMENT_PLAYBOOK.md">Reusable deployment playbook</a> - checklist for other projects.</li>
+<li><a href="TECHNICAL_EXECUTION_PLAN.md">Technical execution proposal</a> - original paid-resource proposal; its cost-bearing steps are superseded by the zero-additional-spend constraint above.</li>
+<li><a href="docs/AURK_Client_Launch_Readiness_Handover_20261106.pdf">Client handover PDF dated 6 November</a> - historical client summary. This checklist takes precedence for current status and budget.</li>
+</ul>
+</main></body></html>

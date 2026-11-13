@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Returns and exchanges &mdash; AURK{% endblock %}
+{% block content %}
+<section class="container commerce-page about-store">
+  <div class="commerce-heading"><p class="eyebrow">AFTER YOUR DELIVERY</p><h1>Returns &amp; exchanges.</h1><p>You can request a return or exchange within <strong>5 days after delivery</strong>.</p></div>
+  <div class="commerce-card">
+    <h2>Item condition</h2>
+    <p>Items requested for return or exchange must be <strong>unused, unwashed, and have their original tags attached</strong>.</p>
+    <h2>Return shipping</h2>
+    <p>Customers are responsible for the cost of shipping items back for a return or exchange.</p>
+    <h2>Refund methods</h2>
+    <p>Refunds are issued through UPI or cash within <strong>3&ndash;5 business days after we receive and inspect the returned item</strong>. <a href="{{ url_for('main.refund_policy') }}">View refund information</a>.</p>
+    <h2>Damaged or incorrect items</h2>
+    <p>If your item is damaged, defective, incorrect or does not match its description, contact us with your order number and details. These store policies do not limit your rights under applicable consumer law.</p>
+    <h2>How to make a request</h2>
+    <p>Contact AURK within the 5-day request window. Include your order number, the item, and whether you would like a return or an exchange.</p>
+    <p>For an exchange, tell us which size or colour you would prefer.</p>
+    <div class="commerce-actions"><a class="button" href="https://wa.me/919392218069">Request on WhatsApp &nearr;</a><a class="subtle-link" href="mailto:support@aurk.in?subject=Return%20or%20exchange%20request">Request by email</a></div>
+    <p class="muted">WhatsApp: +91 9392218069<br>Email: <a class="contact-address" href="mailto:support@aurk.in">support@aurk.in</a></p>
+  </div>
+  <div class="commerce-actions"><a class="subtle-link" href="{{ url_for('orders.list_orders') }}">Find your order number &rarr;</a><a class="subtle-link" href="{{ url_for('main.contact') }}">Contact us</a></div>
+</section>
+{% include 'pages/_business.html' %}{% endblock %}

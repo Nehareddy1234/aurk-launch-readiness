@@ -1,0 +1,12 @@
+{% set notify_launch = product.product_status == 'coming_soon' %}
+{% if notify_launch and not current_user.is_authenticated %}
+<div class="product-interest">
+  <a class="button interest-button notify-button" href="{{ url_for('auth.login', next=url_for('products.detail', slug=product.slug)) }}"><span>Notify me</span><span aria-hidden="true">↗</span></a>
+</div>
+{% else %}
+<form class="product-interest" method="post" action="{{ url_for('products.register_interest', product_id=product.id) }}" data-interest-form {% if notify_launch %}data-notify-launch{% endif %}>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <button class="button interest-button {{ 'notify-button' if notify_launch else '' }}" type="submit" {% if product.id in registered_interest_ids %}disabled{% endif %}>{{ ("You're on the list ✓" if notify_launch else "Interest Registered ✓") if product.id in registered_interest_ids else ("Notify me" if notify_launch else "I'm Interested") }}</button>
+  <p class="interest-message" role="status" aria-live="polite"></p>
+</form>
+{% endif %}

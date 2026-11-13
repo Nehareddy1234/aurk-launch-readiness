@@ -1,0 +1,8 @@
+Hey {{ first_name }},
+
+{{ product_name }} is now available at AURK.
+Explore the drop: {{ product_url }}
+
+Availability can change. This email does not reserve stock or place an order.
+You requested this update using Notify me.
+Questions? {{ support_email }}

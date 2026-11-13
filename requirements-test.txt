@@ -1,0 +1,6 @@
+-r requirements.txt
+pytest-cov>=6,<8
+pytest-randomly>=3,<6
+freezegun>=1.5,<2
+playwright>=1.50,<2
+pypdf>=6,<7

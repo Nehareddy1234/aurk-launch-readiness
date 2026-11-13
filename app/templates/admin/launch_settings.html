@@ -1,0 +1,9 @@
+{% extends 'admin/base.html' %}{% block title %}Business and delivery settings{% endblock %}
+{% block content %}<a href="{{ url_for('admin.settings') }}">&larr; Settings</a><h1>Business and delivery settings</h1>
+<p>Enter confirmed business information. Blank fields are not published. These details appear on Contact and order bills.</p>
+<form method="post" class="panel"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+{% for key,label in [('legal_name','Legal business name'),('address','Business address'),('return_address','Return address'),('grievance_name','Grievance officer name'),('grievance_email','Grievance email'),('gstin','GSTIN, if registered')] %}
+<label>{{ label }}<textarea name="{{ key }}" maxlength="{{ 1500 if 'address' in key else 200 }}">{{ settings[key] }}</textarea></label>{% endfor %}
+<h2>COD coverage</h2><label>Coverage checking<select name="coverage_mode"><option value="manual" {% if settings.coverage_mode=='manual' %}selected{% endif %}>Verify with courier before confirming each order</option><option value="allowlist" {% if settings.coverage_mode=='allowlist' %}selected{% endif %}>Accept only approved PIN codes</option></select></label>
+<label>Courier-approved COD PIN codes<textarea name="cod_pincodes" rows="8">{{ settings.cod_pincodes|join('\n') }}</textarea></label><p>Paste six-digit PIN codes separated by commas or newlines. Use only the coverage list supplied for your courier account.</p>
+<button type="submit">Save settings</button></form>{% endblock %}

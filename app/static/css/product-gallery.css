@@ -1,0 +1,46 @@
+/* Product photos and comfortable laptop / desktop layouts. */
+.storefront-theme .product-photo-controls { display:grid; grid-template-columns:minmax(0,1fr); align-items:center; gap:8px; padding:12px; }
+.storefront-theme .product-photo-controls > span { text-align:center; font-size:13px; }
+.storefront-theme .product-photo-controls button { min-height:44px; padding:6px; border:1px solid var(--line, #ccc); background:var(--surface, #fff); color:var(--text, #161616); cursor:pointer; border-radius:4px; }
+.storefront-theme .product-photo-controls button[hidden] { display:none; }
+.storefront-theme .product-photo-navigation { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.storefront-theme .product-photo-navigation button { flex:0 0 44px; width:44px; padding:0; font-size:24px; line-height:1; }
+.storefront-theme .product-photo-track img { touch-action:pan-y pinch-zoom; -webkit-user-drag:none; }
+.storefront-theme .product-photo-options { grid-column:1 / -1; display:flex; gap:8px; overflow-x:auto; padding:3px; }
+.storefront-theme .product-photo-options button { flex:0 0 54px; height:64px; }
+.storefront-theme .product-photo-options img { width:100%; height:100%; object-fit:contain; }
+.storefront-theme .product-photo-options button[aria-pressed="true"] { border:2px solid #161616; background:#e8e8e8; }
+.storefront-theme .product-photo-controls button:focus-visible { outline:3px solid #1676c2; outline-offset:2px; }
+.storefront-theme .shopping-gallery { min-width:0; }
+.storefront-theme .shopping-main-image { width:100%; position:relative; }
+.storefront-theme .shopping-image-link { display:block; width:100%; height:100%; }
+.storefront-theme .shopping-image-link img { display:block; width:100%; height:100%; object-fit:contain; }
+.storefront-theme .shopping-product-info { min-width:0; overflow-wrap:anywhere; }
+.storefront-theme .shopping-product-layout { display:grid; grid-template-columns:minmax(0,1.15fr) minmax(0,1fr); gap:clamp(24px,4vw,64px); align-items:start; }
+.storefront-theme :is(.home-product-grid,.product-grid) { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); }
+@media (min-width:761px) and (max-width:1199px) {
+ .storefront-theme :is(.home-product-grid,.product-grid) { grid-template-columns:repeat(3,minmax(0,1fr)); }
+}
+@media (max-width:760px) {
+ .storefront-theme .shopping-product-layout { grid-template-columns:minmax(0,1fr); }
+ .storefront-theme :is(.home-product-grid,.product-grid) { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media (max-width:359px) { .storefront-theme :is(.home-product-grid,.product-grid) { grid-template-columns:minmax(0,1fr); } }
+
+.storefront-theme .product-photo-slider { overflow:hidden; touch-action:pan-y pinch-zoom; cursor:grab; }
+.storefront-theme .product-photo-slider.is-dragging { cursor:grabbing; }
+.storefront-theme .product-photo-track { display:flex; width:100%; height:100%; transition:transform .28s ease; }
+.storefront-theme .product-photo-track img { flex:0 0 100%; min-width:0; width:100%; height:100%; object-fit:contain; user-select:none; }
+.storefront-theme .is-dragging .product-photo-track { transition:none; }
+.storefront-theme .photo-slide-hint { color:var(--muted, #666); font-size:12px; }
+@media (prefers-reduced-motion:reduce) { .storefront-theme .product-photo-track { transition:none; } }
+
+/* Fill product frames edge to edge; preserve full-size originals when opened. */
+.storefront-theme :is(.home-product-image,.product-card-image,.shopping-main-image) { aspect-ratio:4 / 5; border:0; padding:0; }
+.storefront-theme :is(.home-product-image,.product-card-image,.shopping-image-link) img { padding:0; border:0; object-fit:cover; }
+.storefront-theme .product-photo-track img { padding:0; object-fit:cover; }
+.storefront-theme .price-display { display:flex; flex-wrap:wrap; gap:8px 12px; align-items:baseline; }
+.storefront-theme .price-display del { color:var(--muted, #666); font-size:.8em; font-weight:400; }
+
+.storefront-theme .product-video { display:block; width:100%; max-height:640px; margin-top:16px; background:#151618; }
+

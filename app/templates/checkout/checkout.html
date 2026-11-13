@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Checkout — AURK{% endblock %}
+{% block content %}
+<section class="container commerce-page checkout-page">
+  <a class="subtle-link" href="{{ url_for('cart.view') }}">&larr; Back to your bag</a>
+  <div class="commerce-heading"><p class="eyebrow">ONE STEP CLOSER</p><h1>Make it yours.</h1><p>Your new favourites, delivered to your door.</p></div>
+  <ol class="checkout-steps" aria-label="Order steps"><li>01 &nbsp; Your bag</li><li aria-current="step">02 &nbsp; Delivery</li><li>03 &nbsp; Confirmation</li></ol>
+  <div class="checkout-layout">
+    <form method="post" class="checkout-form commerce-card" data-submit-once>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <h2>Delivery details</h2><p class="muted">We’ll call this number after confirming your order. All fields are required unless marked optional.</p>
+      <div class="delivery-grid">
+      {% set fields = [('recipient_name','Full name','name',200), ('phone','Phone number','tel',30), ('line1','House / flat and street','address-line1',255), ('line2','Area / landmark (optional)','address-line2',255), ('city','City','address-level2',100), ('state','State','address-level1',100), ('postal_code','PIN / postal code','postal-code',20), ('country','Country','country-name',100)] %}
+      {% for name, label, autocomplete, limit in fields %}
+        <label class="{{ 'full-width' if name in ['line1','line2'] else '' }}" for="{{ name }}">{{ label }}
+          <input id="{{ name }}" name="{{ name }}" autocomplete="{{ autocomplete }}" maxlength="{{ limit }}" {% if name != 'line2' %}required{% endif %} {% if name == 'country' %}readonly{% endif %} {% if name == 'phone' %}type="tel" inputmode="tel"{% elif name == 'postal_code' %}inputmode="numeric"{% endif %} value="{{ 'India' if name == 'country' else request.form.get(name, defaults.get(name, '')) }}">
+        </label>
+      {% endfor %}
+      </div>
+      <label class="check-label"><input type="checkbox" name="save_address" value="1" {% if request.form.get('save_address') %}checked{% endif %}> Save this delivery address</label>
+      <label class="check-label"><input type="checkbox" name="make_default" value="1" {% if request.form.get('make_default') %}checked{% endif %}> Use as my default address when saved</label>
+      <div class="cod-panel"><span class="status-badge">CASH ON DELIVERY</span><h2>Pay when it arrives.</h2><p>No payment is needed now. We’ll review your order, confirm it, and call you shortly after confirmation.</p></div>
+      <p class="muted">Please review our <a href="{{ url_for('main.terms') }}">terms</a>, <a href="{{ url_for('main.shipping') }}">delivery information</a>, <a href="{{ url_for('main.returns') }}">returns policy</a> and <a href="{{ url_for('main.privacy') }}">privacy policy</a> before placing your order.</p>
+      <button class="button checkout-submit" type="submit">Place COD order &middot; ₹{{ '%.2f'|format(total) }}</button>
+      <p class="muted checkout-footnote">Your order will be marked “Awaiting confirmation” until our team confirms it.</p>
+    </form>
+    <aside class="commerce-card checkout-summary">
+      <h2>In your bag <span class="muted">({{ cart.items|sum(attribute='quantity') }})</span></h2>
+      {% for item in cart.items %}
+      <div class="checkout-item">
+        {% if item.variant.product.primary_image %}<img src="{{ url_for('products.product_image', image_id=item.variant.product.primary_image.id) }}" alt="{{ item.variant.product.name }}">{% else %}<div class="checkout-no-image">AR</div>{% endif %}
+        <div><strong>{{ item.variant.product.name }}</strong><small>{{ item.variant.size.name if item.variant.size else 'One size' }} / {{ item.variant.color.name if item.variant.color else 'Default' }} &middot; Qty {{ item.quantity }}</small><span>₹{{ '%.2f'|format((item.variant.price_override if item.variant.price_override is not none else item.variant.product.current_price) * item.quantity) }}</span></div>
+      </div>
+      {% endfor %}
+      <div class="summary-line"><span>Subtotal</span><span>₹{{ '%.2f'|format(subtotal) }}</span></div>
+      <div class="summary-line"><span>Delivery</span><span>Free</span></div>
+      <div class="summary-line summary-total"><strong>Pay on delivery</strong><strong>₹{{ '%.2f'|format(total) }}</strong></div>
+      <p class="muted">Need to change a size or quantity? <a href="{{ url_for('cart.view') }}">Edit your bag</a></p>
+    </aside>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% if config.GOOGLE_CLIENT_ID and config.GOOGLE_CLIENT_SECRET and config.GOOGLE_REDIRECT_URI %}
+<form method="post" action="{{ url_for('auth.google_login', next=next_url) }}">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<button class="button" type="submit">Continue with Google</button>
+</form><p>or use your account details</p>
+{% else %}
+<button class="button" type="button" disabled>Continue with Google</button>
+<p>Google sign-in is currently unavailable.</p>
+{% endif %}
+

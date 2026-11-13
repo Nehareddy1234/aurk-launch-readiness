@@ -1,0 +1,117 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>AURK release runbook</title><style>body{margin:0;background:#f4f5f7;color:#17202b;font:16px/1.65 system-ui,-apple-system,Segoe UI,sans-serif}main{max-width:1100px;margin:32px auto;background:white;padding:40px 48px;border:1px solid #dde2e8;border-radius:12px}h1,h2,h3{line-height:1.2;color:#112840}h1{font-size:34px}h2{margin-top:2em;padding-top:.6em;border-top:1px solid #d9e1ea}h3{margin-top:1.6em}a{color:#075ca8}table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.5;margin:20px 0}th,td{padding:11px 12px;border:1px solid #d9e1ea;text-align:left;vertical-align:top;overflow-wrap:anywhere}th{background:#edf3f9}tr:nth-child(even){background:#fafbfd}pre{overflow:auto;padding:18px;background:#edf3f9;border-radius:6px}code{font-size:.9em}li{margin:.5em 0}.note{color:#536477;font-size:13px}@media(max-width:700px){main{margin:0;padding:24px 14px;border:0;border-radius:0}h1{font-size:27px}table{font-size:12px}td,th{padding:7px 5px}}@media print{body{background:white;font-size:10pt}main{max-width:none;margin:0;padding:0;border:0}h2{break-after:avoid}tr{break-inside:avoid}a{color:#17202b}pre{white-space:pre-wrap}}</style></head><body><main><h1>AURK release runbook</h1>
+<p>Updated 6 November 2026 after authorized read-only AWS console and server diagnostics. This is a procedure for a later authorized deployment. No production configuration was changed; Google account access remains excluded. Read <code>AURK_READINESS_REPORT.md</code> for remaining release gates and <code>WEBSITE_DEPLOYMENT_PLAYBOOK.md</code> for the reusable checklist.</p>
+<h2>1. Protect the existing store</h2>
+<p>This is an upgrade of an existing application. Preserve the existing database, <code>.env</code>, uploads, server configuration and last working release. Do not upload the historical recovery ZIP, run a fresh-start script, reset tables, seed demo customers, overwrite production credentials, or run test fixtures against production.</p>
+<p>The expected historical installation is <code>/home/ubuntu/Aurk</code>, Nginx static files under <code>/var/www/aurk/static</code>, and systemd <code>aurk.service</code>. The read-only inspection confirmed the existing host installation and services. Recheck release, static, environment and upload paths before executing commands. Reconcile source control and save the current release identifier before publishing; local changes have not been committed or pushed.</p>
+<p>Build locally with <code>python scripts/build_release.py</code>. The output is <code>dist/aurk-release.zip</code> plus its SHA-256 file. Validate that checksum after transfer, and verify each entry against <code>release-manifest.json</code>. The package contains application source and bundled media, not customer uploads, databases or secrets. Keep copies of the previous release and its lock file.</p>
+<h2>2. Rehearse on isolated staging</h2>
+<p>Use Linux, MySQL 8.4 and a private Redis service. The exact live Python 3.14.4 runtime passed local Linux backend and Gunicorn checks; the Docker base remains Python 3.11. Do not substitute an untested dependency set. Install <code>requirements-lock.txt</code> into a new virtual environment and run <code>python -m pip check</code>. Local Linux Gunicorn checks passed; an actual Docker image build and systemd/Nginx installation are still unverified. Use a different secret, database and upload directory in staging. Block public access and outgoing customer messages; set <code>CUSTOMER_EMAILS_ENABLED=false</code>, clear SMTP/WhatsApp values, and keep indexing disabled. Robots exclusion alone is not access control.</p>
+<p>Restore a recent backup into staging, inspect its migration revision and rehearse the upgrade. The supported chain is through <code>a1de49fa2387</code>, followed by <code>b2ef50ab3498</code>, <code>c3fa61bc4509</code> and <code>d4ab72cd5610</code>. The live database was observed at <code>a1de49fa2387</code>. An earlier local branch reused migration IDs for different schemas. The migration guard intentionally stops that mismatch. Do not bypass it with <code>flask db stamp</code>, manual revision edits, <code>db.create_all()</code> or table deletion. Compare the actual schema and reconcile it explicitly before proceeding.</p>
+<p>From the isolated installation, with staging configuration loaded:</p>
+<pre><code class="language-sh">.venv/bin/python -m flask --app wsgi:app db current
+.venv/bin/python -m flask --app wsgi:app db upgrade
+.venv/bin/python -m flask --app wsgi:app db current
+</code></pre>
+<p>Expected final revision: <code>d4ab72cd5610</code>. Verify customer/order counts, representative orders, product variants, media, login and administrative access. MySQL tests in this delivery used synthetic data; a restored-store rehearsal remains required.</p>
+<h2>3. Configure production privately</h2>
+<p>Use <code>.env.example</code> as a key inventory, not as ready production configuration. Restrict the real <code>.env</code> to the service owner and never include it in an archive, ticket or repository.</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Production decision</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>FLASK_CONFIG</code></td>
+<td><code>production</code>; debug and test mode off</td>
+</tr>
+<tr>
+<td><code>SECRET_KEY</code></td>
+<td>Unique cryptographically random value, at least 32 characters; rotation signs users out</td>
+</tr>
+<tr>
+<td><code>DATABASE_URL</code></td>
+<td>Existing MySQL database, dedicated least-privilege account; URL-encode password characters</td>
+</tr>
+<tr>
+<td><code>UPLOAD_DIR</code></td>
+<td>Absolute persistent directory; service account can write; excluded from release replacement</td>
+</tr>
+<tr>
+<td><code>SESSION_COOKIE_SECURE</code></td>
+<td><code>true</code>; also secures remember cookies</td>
+</tr>
+<tr>
+<td><code>PUBLIC_BASE_URL</code></td>
+<td><code>https://aurk.in</code></td>
+</tr>
+<tr>
+<td><code>TRUSTED_PROXY_COUNT</code></td>
+<td><code>1</code> only with Gunicorn inaccessible except through the single trusted Nginx proxy</td>
+</tr>
+<tr>
+<td><code>RATELIMIT_STORAGE_URI</code></td>
+<td>Reachable private Redis URL, shared by all web workers</td>
+</tr>
+<tr>
+<td><code>SEARCH_INDEXING_ENABLED</code></td>
+<td><code>false</code> during staging; <code>true</code> only for the approved public store</td>
+</tr>
+<tr>
+<td><code>MAIL_*</code>, <code>ORDER_ALERT_EMAIL</code></td>
+<td>Verified sender/recipient and TLS SMTP settings; choose TLS or SSL, not both</td>
+</tr>
+<tr>
+<td><code>CUSTOMER_EMAILS_ENABLED</code></td>
+<td>Enable after controlled-inbox delivery and worker checks</td>
+</tr>
+<tr>
+<td><code>GOOGLE_CLIENT_ID</code>, <code>GOOGLE_CLIENT_SECRET</code>, <code>GOOGLE_REDIRECT_URI</code></td>
+<td>Leave all blank for this scope. Password/phone login remains available. Configure Google later if desired</td>
+</tr>
+<tr>
+<td>WhatsApp and payment gateway secrets</td>
+<td>Leave disabled/unset for the agreed manual COD workflow</td>
+</tr>
+<tr>
+<td>Business fields</td>
+<td>Enter confirmed facts in Admin &gt; Business &amp; delivery; do not invent GST registration or addresses</td>
+</tr>
+</tbody>
+</table>
+<p>Run <code>python -m flask --app wsgi:app check-deployment --technical-only</code> during preparation and the same command without the flag for business launch sign-off. The technical-only flag deliberately defers business disclosures; it is not approval to open orders. The full check still cannot certify TLS, actual email arrival, backups, legal applicability or all operational settings.</p>
+<h2>4. Publish the approved release</h2>
+<p><strong>Before scheduling:</strong> the observed 8 GiB root volume is 84% full (about 1.1 GiB free), unencrypted and configured for deletion on termination. No recoverable store backup was demonstrated. Complete a verified private off-server backup and plan capacity/encryption/address protection before deploying. The preflight requires at least 2 GiB free. Capacity changes and Elastic IP allocation are later AWS writes, with costs to review; none have been made.</p>
+<ol>
+<li>Announce a maintenance window and retain a maintenance response at the proxy. Stop writes and the notification scheduler. The existing scheduler is <code>aurk-customer-emails.timer</code>: disable/stop it during the reviewed handover and wait for its service to finish before enabling <code>aurk-notifications.timer</code>. Also inspect cron/other workers; only one scheduler should own each job.</li>
+<li>Take a consistent database-and-uploads backup and verify a copy away from the server. Record the last order number and backup time.</li>
+<li>Install the verified source into a separate release directory; attach the existing private configuration and persistent uploads. Install locked dependencies. Rehearse path changes before replacing the historical in-place layout.</li>
+<li>Apply reviewed migrations once while writes are stopped. Never let multiple deployments migrate concurrently.</li>
+<li>Run Gunicorn using <code>gunicorn.conf.py</code> behind Nginx. Use the existing app service only after checking its user, working directory, environment and restart policy. Do not serve production using Flask's development server. See <a href="https://flask.palletsprojects.com/en/stable/deploying/">Flask deployment guidance</a>.</li>
+<li>Adapt <code>nginx/ar_drips.conf</code> to the verified certificate paths and static root; validate with <code>nginx -t</code> before reload. Serve the new static tree as well as Python/templates. Verify HTTPS, HTTP redirects, the chosen canonical hostname and certificate renewal. Restrict database, Redis and Gunicorn ports to private/local access.</li>
+<li>Install the reviewed <code>aurk-notifications.service</code> and timer from <code>deploy/</code>; they assume <code>/home/ubuntu/Aurk</code> and user <code>ubuntu</code>. Confirm environment, paths and permissions, reload systemd and start the timer. Run one controlled batch and inspect logs and queue states.</li>
+<li>Run readiness/smoke checks below before opening orders. Keep rollback available throughout.</li>
+</ol>
+<p>The Compose file is an alternative deployment route. Do not run it alongside the host installation against the same live database. It enforces production configuration and secure cookies for web, migration and worker services, so customer use requires an HTTPS proxy. It deliberately does not migrate on web restart. After backup and stopping writes, build the release, start dependencies, migrate once, then start web/worker:</p>
+<pre><code class="language-sh">docker compose build
+docker compose up -d db redis
+docker compose --profile maintenance run --rm migrate
+docker compose up -d web order-alerts
+</code></pre>
+<p>A Docker image build and Linux systemd/Nginx installation have not been executed. YAML parsing and local Gunicorn tests do not certify those deployment routes.</p>
+<h2>5. Backups, recovery and monitoring</h2>
+<p><code>deploy/backup-maintenance.sh</code> temporarily stops the application and notification timer to create a consistent bundle. This causes a short outage; choose and communicate the maintenance window. The supplied daily timer is 21:30 UTC / 03:00 IST. Review all paths and any older workers before enabling it.</p>
+<p><code>scripts/backup_store.py</code> uses a private MySQL defaults file (mode 600), includes uploads and SQL, writes a checksum manifest, and checks S3 public-access blocking before encrypted upload. The backup destination and permissions are intentionally unconfigured. Read-only AWS inspection found a private deployment-artifact bucket, not verified store backups; do not assume it is a configured backup destination. If a different backup provider is chosen, implement and verify its private off-server copy before enabling unattended backup. A local archive alone is insufficient protection against server loss. Establish retention and space monitoring; this script does not prune old bundles. A suggested starting policy is 7 daily and 4 weekly copies, adjusted to the business's retention obligations and recovery goals.</p>
+<p>Restore only trusted backups. <code>scripts/restore_drill.py</code> verifies the checksum, rejects unsafe archive paths and restores into a newly named local scratch database and folder. SQL backups are trusted executable database input; use an isolated recovery server/account. Example, with actual private paths substituted:</p>
+<pre><code class="language-sh">python scripts/restore_drill.py --bundle /private/download/store.tar.gz --manifest /private/download/manifest.json --scratch-parent /private/drills --mysql-defaults /private/mysql-drill.cnf
+</code></pre>
+<p>After restore, inspect counts, representative orders and uploads, run the reviewed migration and exercise the app with outgoing mail disabled. Record elapsed recovery time. Cleanup only the exact scratch schema and directory after verification. A successful backup upload is not a successful restore drill.</p>
+<p>The health timer checks disk/upload access, <code>/api/ready</code> and notification queues. Local <code>aurk-alert@.service</code> and <code>scripts/operational_alert.py</code> templates now provide bounded failure email without depending on the application database. They remain uninstalled and unconfigured. After recipient/test-message approval, configure <code>/etc/aurk/alerts.env</code> from <code>deploy/alerts.env.example</code> and install the alert unit alongside the health/backup/notification units. The alert reads existing SMTP settings privately and suppresses repeated attempts for the same unit for one hour, including uncertain SMTP outcomes. This is not proof of inbox delivery and cannot report a whole-host or network outage when its own host is down. Configure an external uptime check and an alert destination, and test a failure. Alert on failed backups, database connectivity, disk pressure, queue age and worker failures. The supplied Gunicorn/Nginx access formats omit request URLs to avoid logging reset tokens. Validate Nginx configuration before reload and keep private error logs access restricted. Logs must not expose credentials, session tokens or unnecessary customer data. Apply log rotation and access restrictions.</p>
+<p>Customer and order email workers use retry controls, but SMTP acceptance is not proof of inbox delivery and exactly-once delivery cannot be guaranteed across a process crash. Product-interest owner alerts now use bounded retries (five attempts), exponential backoff and a hold for uncertain SMTP outcomes. Run <code>flask --app wsgi:app check-operations</code> to detect stale/exhausted/uncertain queues without sending mail. After reviewing one failed alert against provider/inbox evidence, <code>flask --app wsgi:app retry-interest-alert ID --reviewed</code> requeues that alert for the worker; it does not send immediately. Never bulk-reset uncertain messages. Before manually resending an uncertain message, check provider logs and the recipient inbox. Do not send real customer test messages.</p>
+<h2>6. Public acceptance and rollback</h2>
+<p>After later deployment, run the read-only <code>python scripts/production_smoke.py --base-url https://aurk.in</code> and inspect its JSON evidence. Also verify <code>/api/ready</code>, robots/sitemap/feed, HTTPS redirects, secure cookie flags, private-page noindex, responsive layout, media range requests and caching. Test with a controlled account/inbox: registration, login, password recovery, cart changes, COD order, owner confirmation, shipment/tracking, cancellation and reconciliation. Use an approved test-order procedure so stock, courier requests and accounting are not confused with sales. Check real iOS/Safari and Android devices and slow connectivity; local Chromium emulation is incomplete coverage.</p>
+<p>Rollback trigger: broken checkout/login, schema errors, lost media, serious security regression or persistent elevated failures. Stop writes and workers first. If schema-compatible, restore the previous source/configuration/static release and smoke-test. Do not blindly downgrade a database after accepting new orders. If restore is necessary, reconcile all writes after the backup with the business before replacing data. Record the incident, recovery time and corrective action.</p>
+<p>Open the store only after the owner has confirmed disclosures, courier coverage workflow, support ownership, verified email, backup recovery and the live acceptance checks. Google submission is a separate later task; it is not required for customers to visit a working URL.</p>
+</main></body></html>

@@ -1,0 +1,392 @@
+{% extends "admin/base.html" %}
+
+{% block title %}
+    {{ "Edit Product" if edit_mode else "Add Product" }} — AURK
+{% endblock %}
+
+{% block content %}
+
+<section class="form-card">
+
+    <h1>
+        {{ "Edit Product" if edit_mode else "Add Product" }}
+    </h1>
+
+    {% if error %}
+        <div class="alert alert-error">
+            {{ error }}
+        </div>
+    {% endif %}
+
+
+    <!-- =====================================================
+         MAIN PRODUCT FORM
+    ====================================================== -->
+
+    <p>Search titles and descriptions can be customized below. Blank fields use the product name and description.</p>
+    <form
+        method="post"
+        enctype="multipart/form-data"
+    >
+
+        <input
+            type="hidden"
+            name="csrf_token"
+            value="{{ csrf_token() }}"
+        >
+
+
+        <label>Search title<input name="seo_title" maxlength="255" value="{{ product.seo_title or '' if product else '' }}"></label>
+        <label>Search description<textarea name="seo_description" maxlength="500">{{ product.seo_description or '' if product else '' }}</textarea></label>
+        <!-- PRODUCT NAME -->
+
+        <label>
+            Name
+
+            <input
+                type="text"
+                name="name"
+                maxlength="255"
+                value="{{ product.name if product else '' }}"
+                required
+            >
+        </label>
+
+        <label>Product status
+            <select name="product_status" required>
+            {% for value, label in [('available','Available'),('coming_soon','Coming Soon'),('out_of_stock','Out of Stock')] %}
+                <option value="{{ value }}" {% if request.form.get('product_status', product.product_status if product else 'available') == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+            </select>
+        </label>
+        <p class="form-help">Availability controls purchasing independently of visibility and size/colour stock.</p>
+        <fieldset>
+            <legend>Storefront visibility</legend>
+            <label><input type="checkbox" name="is_active" value="1" {% if not product or product.is_active %}checked{% endif %}> Visible in shop</label>
+            <label><input type="checkbox" name="is_featured" value="1" {% if product and product.is_featured %}checked{% endif %}> Featured</label>
+            <label><input type="checkbox" name="is_new_arrival" value="1" {% if product and product.is_new_arrival %}checked{% endif %}> New arrival</label>
+            <label><input type="checkbox" name="is_bestseller" value="1" {% if product and product.is_bestseller %}checked{% endif %}> Bestseller</label>
+        </fieldset>
+
+
+        <!-- SLUG -->
+
+        <label>
+            Slug
+
+            <input
+                type="text"
+                name="slug"
+                maxlength="280"
+                placeholder="example-product-name"
+                value="{{ product.slug if product else '' }}"
+                required
+            >
+        </label>
+
+
+        <!-- DESCRIPTION -->
+
+        <label>
+            Description
+
+            <textarea
+                name="description"
+                maxlength="10000"
+                rows="7"
+            >{{ product.description if product else '' }}</textarea>
+        </label>
+
+
+        {% include 'admin/_product_pricing.html' %}
+
+        <!-- CATEGORY -->
+
+        <label>
+            Category
+
+            <select
+                name="category_id"
+                required
+            >
+
+                <option value="">
+                    Select category
+                </option>
+
+                {% for category in categories %}
+
+                    <option
+                        value="{{ category.id }}"
+                        {% if product and product.category_id == category.id %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ category.name }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </label>
+
+
+        <!-- =====================================================
+             UPLOAD NEW IMAGES
+        ====================================================== -->
+
+        <div class="image-upload-section">
+<p class="form-help"><strong>Recommended photo size: 1200 × 1500 pixels (4:5 portrait).</strong> Use JPG, PNG or WEBP. Keep each photo around 200–500 KB and the entire upload under 100 MB. Upload front, back, side and detail views together; the first photo is the cover. Size charts can use their original proportions.</p>
+
+            <label for="product-images">
+                Product Photos and Videos
+            </label>
+
+            <p class="form-help">
+                Add front, back, side, close-up and size-chart images together using the multiple-file selector. You can also add more images when editing. Choose Make Primary on the front photo to use it as the cover. Size charts keep their original proportions and customers can open them at full size.
+                Recommended: 1200 &times; 1500 pixels (4:5 portrait), JPG or WEBP; PNG is also accepted.
+                Storefront photos fill the image area; different proportions may be cropped. Use consistent backgrounds and leave a little space around the product.
+                Upload up to 10 photos and videos; keep each around 200&ndash;500 KB and the entire upload below 100 MB.
+            </p>
+
+            <input
+                id="product-images"
+                type="file"
+                name="images" data-image-upload data-existing-count="{{ product.images|length if product else 0 }}"
+                accept="image/jpeg,image/png,image/webp,video/mp4,.mp4"
+                multiple
+                {% if not edit_mode %}
+                    required
+                {% endif %}
+            ><p class="form-help">Select several photos together, or choose more photos in another selection. Up to 10 photos and videos per product. MP4 videos: up to 25 MB each. Photos: up to 8 MB each. Total upload: under 100 MB.</p><div data-upload-list aria-live="polite"></div>
+
+        </div>
+
+
+        <!-- SAVE PRODUCT -->
+
+        <button
+            type="submit"
+            class="button"
+        >
+            {{ "Save Changes" if edit_mode else "Add Product" }}
+        </button>
+
+    </form>
+
+
+    <!-- =====================================================
+         SAVED PRODUCT IMAGES
+         
+         IMPORTANT:
+         This is OUTSIDE the main product form.
+         ====================================================== -->
+
+    {% if edit_mode and product and product.images %}
+
+        <section class="existing-images-section">
+
+            <div class="existing-images-header">
+
+                <div>
+                    <h2>
+                        Saved Product Media
+                    </h2>
+
+                    <p class="form-help">
+                        {{ product.images|length }} image{% if product.images|length != 1 %}s{% endif %}
+                        saved for this product.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="existing-images-grid">
+
+                {% for image in product.images %}
+
+                    <article
+                        class="existing-image-card
+                        {% if image.is_primary and image.mime_type != 'video/mp4' %}
+                            is-primary
+                        {% endif %}"
+                    >
+
+                        <!-- IMAGE -->
+
+                        <div class="existing-image-preview">
+
+{% if image.mime_type == 'video/mp4' %}<video controls playsinline preload="metadata" src="{{ url_for('admin.product_image', image_id=image.id) }}"></video>{% else %}                            <img
+                                src="{{ url_for('admin.product_image', image_id=image.id) }}"
+                                alt="{{ product.name }} image {{ loop.index }}"
+                                loading="lazy"
+                            >{% endif %}
+
+                            {% if image.is_primary and image.mime_type != 'video/mp4' %}
+
+                                <span class="primary-image-badge">
+                                    ★ Primary
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- INFO -->
+
+                        <div class="existing-image-info">
+
+                            <strong>
+                                Image {{ loop.index }}
+                            </strong>
+
+                            <span>
+                                {{ image.width }} × {{ image.height }}
+                            </span>
+
+                        </div>
+
+
+                        <!-- ACTIONS -->
+
+                        <div class="existing-image-actions">
+
+                            {% if image.is_primary and image.mime_type != 'video/mp4' %}
+
+                                <span class="current-primary-label">
+                                    ★ Primary Image
+                                </span>
+
+                            {% elif image.mime_type != 'video/mp4' %}
+
+                                <form
+                                    method="post"
+                                    action="{{ url_for(
+                                        'admin.set_primary_image',
+                                        product_id=product.id,
+                                        image_id=image.id
+                                    ) }}"
+                                >
+
+                                    <input
+                                        type="hidden"
+                                        name="csrf_token"
+                                        value="{{ csrf_token() }}"
+                                    >
+
+                                    <button
+                                        type="submit"
+                                        class="make-primary-button"
+                                    >
+                                        ★ Make Primary
+                                    </button>
+
+                                </form>
+
+                            {% endif %}
+
+
+                            {% if product.images|length > 1 %}
+
+                                <form
+                                    method="post"
+                                    action="{{ url_for(
+                                        'admin.delete_product_image',
+                                        product_id=product.id,
+                                        image_id=image.id
+                                    ) }}"
+                                    data-confirm="Are you sure you want to delete this image?"
+                                >
+
+                                    <input
+                                        type="hidden"
+                                        name="csrf_token"
+                                        value="{{ csrf_token() }}"
+                                    >
+
+                                    <button
+                                        type="submit"
+                                        class="delete-image-button"
+                                    >
+                                        Delete
+                                    </button>
+
+                                </form>
+
+                            {% else %}
+
+                                <span class="last-image-label">
+                                    Last image
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+                    </article>
+
+                {% endfor %}
+
+            </div>
+
+        </section>
+
+    {% elif edit_mode %}
+
+        <section class="existing-images-section">
+
+            <h2>
+                Saved Product Media
+            </h2>
+
+            <p class="form-help">
+                No images have been uploaded for this product yet.
+            </p>
+
+        </section>
+
+    {% endif %}
+
+    {% if edit_mode and product %}
+        <section class="existing-images-section">
+            <h2>Sizes, colours and stock</h2>
+            <p class="form-help">Each size and colour is a unique sellable SKU. Adding an option with opening stock creates its inventory entry immediately. Later stock edits update that same entry.</p>
+
+            {% for variant in product.variants %}
+                <form method="post" action="{{ url_for('admin.update_variant', product_id=product.id, variant_id=variant.id) }}" class="variant-admin-row">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <span class="muted"><small>{{ variant.sku }}</small></span>
+                    <strong>{{ variant.size.name }} — {{ variant.color.name }}</strong>
+                    <label>Stock <input type="number" name="quantity" min="0" value="{{ variant.inventory.quantity if variant.inventory else 0 }}" required></label>
+                    <label><input type="checkbox" name="is_active" value="1" {% if variant.is_active %}checked{% endif %}> Active</label>
+                    <button type="submit">Save</button>
+                </form>
+            {% else %}
+                <p class="form-help">No sellable options yet. Add the first one below.</p>
+            {% endfor %}
+
+            <form method="post" action="{{ url_for('admin.create_variant', product_id=product.id) }}" class="form-card">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <h3>Add sizes</h3>
+                <p>Click the sizes you sell. Product codes (SKUs) are created automatically.</p>
+                <fieldset class="admin-size-picker"><legend>Choose sizes</legend><div class="admin-size-buttons">
+                {% for size in ['XS','S','M','L','XL','XXL','3XL','4XL','One size'] %}
+                <label><input type="checkbox" name="sizes" value="{{ size }}" {% if size in request.form.getlist('sizes') %}checked{% endif %}><span>{{ size }}</span></label>
+                {% endfor %}</div></fieldset>
+                <label>Colour<input name="color_name" maxlength="50" placeholder="e.g. Black" value="{{ request.form.get('color_name','') }}" required></label>
+                <label>Stock for each selected size<input type="number" name="quantity" min="0" max="1000000" value="{{ request.form.get('quantity','0') }}" required></label>
+                <p class="form-help">For example: selecting S, M and L with stock 5 creates 5 of each size. You can change individual stock above afterward. Existing size/colour combinations will not be overwritten.</p>
+                <details><summary>Other size or different price (optional)</summary>
+                <label>Custom size<input name="custom_size" maxlength="30" placeholder="e.g. 32 or 6-7 years" value="{{ request.form.get('custom_size','') }}"></label>
+                <label>Price for these sizes (leave empty to use the product price)<input type="number" name="price_override" min="0" step="0.01" value="{{ request.form.get('price_override','') }}"></label></details>
+                <button type="submit" class="button">Add sizes</button>
+            </form>
+        </section>
+    {% endif %}
+
+</section>
+
+{% endblock %}

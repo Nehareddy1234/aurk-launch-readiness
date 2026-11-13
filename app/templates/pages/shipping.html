@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Shipping &mdash; AURK{% endblock %}
+{% block content %}
+<section class="container commerce-page about-store">
+  <div class="commerce-heading"><p class="eyebrow">FROM OUR STORE TO YOUR DOOR</p><h1>Shipping.</h1><p>We deliver to <strong>serviceable addresses in India</strong>.</p></div>
+  <div class="commerce-card">
+    <h2>Free delivery</h2>
+    <p>We offer <strong>free delivery on all confirmed orders to serviceable addresses in India</strong>. No minimum order value is required.</p>
+    <h2>Delivery details</h2>
+    <p>At checkout, enter your complete delivery address, city, state, PIN code, and phone number so we can coordinate your delivery.</p>
+    <h2>Order confirmation</h2>
+    <p>After you place an order, our team checks DTDC cash-on-delivery coverage for your address before confirming it. If your address is not serviceable, we will contact you; no payment is collected. You will receive a call shortly after confirmation.</p>
+    <h2>Estimated delivery time</h2>
+    <p>Delivery is estimated within <strong>3&ndash;5 business days after order confirmation</strong>.</p>
+    <h2>Cash on delivery</h2>
+    <p>No payment is needed when placing your order. Pay when your order arrives.</p>
+    <div class="commerce-actions"><a class="button" href="{{ url_for('orders.list_orders') }}">Track your order</a><a class="subtle-link" href="{{ url_for('main.contact') }}">Delivery questions? Contact us</a></div>
+  </div>
+</section>
+{% endblock %}

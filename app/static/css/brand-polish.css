@@ -1,0 +1,43 @@
+/* Black editorial navigation and the supplied brand artwork. */
+.storefront-theme .aurk-topline { background:#000; color:#fff; border-bottom:1px solid #222; padding-block:12px; }
+.storefront-theme .aurk-editorial-header { background:#000; color:#fff; padding:24px var(--page-gutter); min-height:112px; border-bottom:1px solid #222; }
+.storefront-theme .aurk-editorial-header .logo { background:transparent; padding:0; }
+.storefront-theme .aurk-editorial-header .aurk-artwork-square { background:transparent; width:clamp(160px,16vw,220px); }
+.storefront-theme .aurk-editorial-header :is(.aurk-wordmark,nav a,.aurk-header-actions a) { color:#fff; }
+.storefront-theme .aurk-editorial-header .aurk-logo-lockup small { color:#666; }
+.storefront-theme .aurk-editorial-header nav a { font-size:11px; letter-spacing:.16em; }
+.storefront-theme .aurk-editorial-header nav a:hover { color:#777; }
+.storefront-theme .aurk-editorial-header :is(button,.site-menu-toggle) { background:#000; color:#fff; border-color:#444; }
+.storefront-theme .aurk-editorial-header[data-scrolled="true"] { border-bottom-color:#222; box-shadow:0 4px 18px #00000008; }
+.storefront-theme .aurk-editorial-header :focus-visible { outline-color:#fff; }
+.storefront-theme .site-footer { background:#000; padding-block:56px 28px; align-items:start; }
+.storefront-theme .footer-brand { display:flex; align-items:flex-start; justify-content:flex-start; }
+.storefront-theme .site-footer .footer-logo { display:block; width:clamp(180px,22vw,260px); max-width:100%; padding:0; background:transparent; }
+.storefront-theme .footer-logo img { display:block; width:100%; height:auto; max-height:none; object-fit:contain; }
+.storefront-theme .site-footer nav { padding-top:24px; }
+@media(max-width:1024px) {
+ .storefront-theme .aurk-editorial-header { padding:18px var(--page-gutter); min-height:88px; }
+ .storefront-theme .aurk-editorial-header .aurk-artwork-square { width:160px; }
+}
+@media(max-width:760px) {
+ .storefront-theme .site-footer { padding-block:36px 24px; }
+ .storefront-theme .site-footer .footer-logo { width:200px; }
+ .storefront-theme .site-footer nav { padding-top:0; }
+}
+@media(max-width:480px) {
+ .storefront-theme .aurk-editorial-header .aurk-artwork-square { width:130px; }
+}
+
+.storefront-theme .header-logo-frame { display:block; position:relative; width:clamp(160px,18vw,240px); aspect-ratio:4.8; overflow:hidden; background:transparent; }
+.storefront-theme .header-logo-frame img { display:block; position:absolute; width:130%; max-width:none; height:auto; left:-15%; top:50%; transform:translateY(-50%); filter:none; mix-blend-mode:normal; }
+@media(max-width:1024px) { .storefront-theme .header-logo-frame { width:160px; } }
+@media(max-width:480px) { .storefront-theme .header-logo-frame { width:125px; } }
+
+.storefront-theme .aurk-founder-story { white-space:pre-wrap; max-width:760px; margin:0 auto; padding-block:clamp(24px,5vw,64px); font-size:clamp(16px,1.5vw,20px); line-height:1.85; overflow-wrap:break-word; }
+
+/* Keep reading text free of an insertion caret; preserve editable fields. */
+.storefront-theme { cursor:default; caret-color:transparent; }
+.storefront-theme :is(input, textarea, [contenteditable="true"], [contenteditable=""]) {
+  cursor:auto;
+  caret-color:auto;
+}

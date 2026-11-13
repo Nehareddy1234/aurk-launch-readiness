@@ -1,0 +1,18 @@
+<dialog id="aurk-size-chart" class="size-chart-dialog" aria-labelledby="size-chart-title">
+  <div class="size-chart-heading"><div><h2 id="size-chart-title">AURK size guide</h2><p>T-shirt measurements in inches</p></div><button type="button" data-size-chart-close aria-label="Close size chart" autofocus>&times;</button></div>
+  <p class="size-chart-hint">Swipe the table sideways to see every measurement.</p>
+  <div class="size-chart-scroll" tabindex="0" role="region" aria-label="Size measurements. Scroll horizontally to see all columns.">
+    <table><caption>Body and finished T-shirt measurements</caption><thead><tr><th scope="col">Size</th><th scope="col">Body chest</th><th scope="col">T-shirt chest<br>(full / flat)</th><th scope="col">Length</th><th scope="col">Shoulder</th><th scope="col">Sleeve</th></tr></thead><tbody>
+      {% for size,chest,shirt,length,shoulder,sleeve in [('XXS','30–32','38 / 19','24.00','19.00','7.50'),('XS','32–34','40 / 20','24.75','19.75','7.75'),('S','34–36','42 / 21','25.50','20.50','8.00'),('M','36–38','44 / 22','26.25','21.25','8.25'),('L','38–40','46 / 23','27.00','22.00','8.50'),('XL','40–42','48 / 24','27.75','22.75','8.75'),('XXL','42–44','50 / 25','28.50','23.50','9.00'),('3XL','44–46','52 / 26','29.25','24.25','9.25')] %}<tr><th scope="row">{{ size }}</th><td>{{ chest }}</td><td>{{ shirt }}</td><td>{{ length }}</td><td>{{ shoulder }}</td><td>{{ sleeve }}</td></tr>{% endfor %}
+    </tbody></table>
+  </div>
+  <div class="size-chart-instructions"><h3>How to measure</h3><dl>
+    <dt>Body chest</dt><dd>Measure around the fullest part of your chest.</dd>
+    <dt>Flat chest</dt><dd>Measure your T-shirt across the chest, laid flat.</dd>
+    <dt>Length</dt><dd>Highest shoulder point to hem.</dd>
+    <dt>Shoulder</dt><dd>Shoulder seam to shoulder seam.</dd>
+    <dt>Sleeve</dt><dd>Shoulder seam to sleeve hem.</dd>
+  </dl><p>At a range boundary, choose the smaller size: 36 inches = S; above 36 to 38 inches = M. Choose an adjacent size for your preferred roominess.</p>
+  <p>T-shirt measurements are finished garment measurements before customer washing.</p>
+  <a href="{{ url_for('static', filename='images/guides/aurk-size-guide-inches.png') }}" target="_blank" rel="noopener">View original size guide image &nearr;</a></div>
+</dialog>

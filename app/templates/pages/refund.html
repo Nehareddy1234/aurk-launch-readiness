@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Refunds &mdash; AURK{% endblock %}
+{% block content %}
+<section class="container commerce-page about-store">
+  <div class="commerce-heading"><p class="eyebrow">AFTER A RETURN</p><h1>Refunds.</h1><p>Refunds for cash-on-delivery purchases are available through <strong>UPI or cash</strong>.</p></div>
+  <div class="commerce-card">
+    <h2>Your refund method</h2>
+    <p>When contacting us about a return, let us know whether you prefer a UPI or cash refund. Our team will coordinate the refund arrangements with you.</p>
+    <h2>Refund timeline</h2>
+    <p>Refunds are issued within <strong>3&ndash;5 business days after we receive and inspect the returned item</strong>.</p>
+    <h2>Requesting a return</h2>
+    <p>Return requests must be made within 5 days after delivery. Please review our returns and exchanges page for the item-condition and return-shipping requirements.</p>
+    <div class="commerce-actions"><a class="button" href="{{ url_for('main.returns') }}">Returns &amp; exchanges</a><a class="subtle-link" href="{{ url_for('main.contact') }}">Contact us about a refund</a></div>
+  </div>
+</section>
+{% endblock %}

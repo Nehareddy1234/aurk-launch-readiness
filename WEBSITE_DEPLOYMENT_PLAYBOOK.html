@@ -1,0 +1,660 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Reusable website deployment checklist and launch report</title><style>body{margin:0;background:#f4f5f7;color:#17202b;font:16px/1.65 system-ui,-apple-system,Segoe UI,sans-serif}main{max-width:1100px;margin:32px auto;background:white;padding:40px 48px;border:1px solid #dde2e8;border-radius:12px}h1,h2,h3{line-height:1.2;color:#112840}h1{font-size:34px}h2{margin-top:2em;padding-top:.6em;border-top:1px solid #d9e1ea}h3{margin-top:1.6em}a{color:#075ca8}table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.5;margin:20px 0}th,td{padding:11px 12px;border:1px solid #d9e1ea;text-align:left;vertical-align:top;overflow-wrap:anywhere}th{background:#edf3f9}tr:nth-child(even){background:#fafbfd}pre{overflow:auto;padding:18px;background:#edf3f9;border-radius:6px}code{font-size:.9em}li{margin:.5em 0}.note{color:#536477;font-size:13px}@media(max-width:700px){main{margin:0;padding:24px 14px;border:0;border-radius:0}h1{font-size:27px}table{font-size:12px}td,th{padding:7px 5px}}@media print{body{background:white;font-size:10pt}main{max-width:none;margin:0;padding:0;border:0}h2{break-after:avoid}tr{break-inside:avoid}a{color:#17202b}pre{white-space:pre-wrap}}</style></head><body><main><p class="note">Updated 6 November 2026 · Offline report · Edit the companion Markdown file to reuse it. Print from your browser to save a PDF.</p><h1>Reusable website deployment checklist and launch report</h1>
+<p>Template version: 6 November 2026. Copy this file into any project and replace the project record below. It applies to static sites, web applications and online stores. Requirements change with location, audience, data and business model; review conditional items for each project.</p>
+<h2>Project record — fill this in for each release</h2>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Project value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Project / release / source commit</td>
+<td>TO COMPLETE</td>
+</tr>
+<tr>
+<td>Owner / technical maintainer / support contact</td>
+<td>TO COMPLETE</td>
+</tr>
+<tr>
+<td>Public URL / staging URL</td>
+<td>TO COMPLETE</td>
+</tr>
+<tr>
+<td>Site type</td>
+<td>Static / application / shop / other</td>
+</tr>
+<tr>
+<td>Audience and operating jurisdictions</td>
+<td>TO COMPLETE</td>
+</tr>
+<tr>
+<td>Data collected and external providers</td>
+<td>TO COMPLETE</td>
+</tr>
+<tr>
+<td>Hosting, runtime, database and persistent storage</td>
+<td>TO COMPLETE</td>
+</tr>
+<tr>
+<td>Release date and maintenance window</td>
+<td>TO COMPLETE</td>
+</tr>
+<tr>
+<td>Maximum acceptable data loss / recovery time</td>
+<td>TO COMPLETE</td>
+</tr>
+<tr>
+<td>Reviewer / decision / evidence location</td>
+<td>TO COMPLETE</td>
+</tr>
+</tbody>
+</table>
+<p>Use these status values: <strong>PASS</strong> (verified evidence), <strong>FAIL</strong> (does not meet the criterion), <strong>PENDING</strong> (not checked or awaiting input), <strong>N/A</strong> (does not apply, with reason). Never treat “implemented,” “installed,” or “looks fine” as proof of a production check. Assign an owner and evidence to every applicable launch gate.</p>
+<p>Priority labels: <strong>Gate</strong> = necessary before exposing the affected feature to real users; <strong>Conditional gate</strong> = necessary when the stated condition applies; <strong>Recommended</strong> = useful quality or resilience measure; <strong>Optional</strong> = deliberate product choice. A gate is an engineering release rule here, not a claim that every jurisdiction legally mandates it.</p>
+<h2>What you actually need</h2>
+<p>A basic public site needs deployable content, a host that serves it, a reachable URL, HTTPS for safe public use, correct configuration, and working content/navigation. A host-provided address can work; a purchased custom domain is a branding choice. Dynamic applications also need a production runtime, secret management, reliable data storage where used, and operational ownership. Shops add accurate product/pricing information, a working order and fulfilment process, customer support and applicable business disclosures.</p>
+<p>You do not inherently need AWS, Google submission, a particular repository host, paid SSL, a payment gateway for COD, analytics, a sticky mobile button, or a promotional monitoring platform. You do need to assess the capabilities those services would provide. Search visibility is separate from URL availability; submission is not a guarantee of indexing or sales.</p>
+<table>
+<thead>
+<tr>
+<th>Capability</th>
+<th>Static informational site</th>
+<th>Account/application site</th>
+<th>Online shop</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Hosting, HTTPS, working public URL</td>
+<td>Gate</td>
+<td>Gate</td>
+<td>Gate</td>
+</tr>
+<tr>
+<td>Production application server</td>
+<td>Only if server logic exists</td>
+<td>Gate</td>
+<td>Gate for server-driven orders</td>
+</tr>
+<tr>
+<td>Database</td>
+<td>Only when needed</td>
+<td>If persistent records exist</td>
+<td>Usually needed for products/orders</td>
+</tr>
+<tr>
+<td>Authentication and authorization</td>
+<td>If restricted areas exist</td>
+<td>Gate for accounts/private data</td>
+<td>Gate for admin and customer accounts</td>
+</tr>
+<tr>
+<td>Transactional email</td>
+<td>If forms promise email</td>
+<td>If recovery/notifications depend on it</td>
+<td>If receipts/status/support depend on it</td>
+</tr>
+<tr>
+<td>Payment provider</td>
+<td>N/A unless taking payments</td>
+<td>If taking online payments</td>
+<td>Only for selected online payment methods; COD can operate without one</td>
+</tr>
+<tr>
+<td>Shipping and returns workflow</td>
+<td>N/A</td>
+<td>If physical goods involved</td>
+<td>Gate for physical goods</td>
+</tr>
+<tr>
+<td>Analytics and advertising</td>
+<td>Optional</td>
+<td>Optional</td>
+<td>Optional</td>
+</tr>
+<tr>
+<td>Cookie consent interface</td>
+<td>Depends on actual technologies and applicable rules</td>
+<td>Same</td>
+<td>Same</td>
+</tr>
+</tbody>
+</table>
+<h2>1. Product, content and user journeys</h2>
+<p>For each row, record <code>status | owner | evidence/date</code> in your project copy.</p>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Priority</th>
+<th>Acceptance criterion</th>
+<th>Status / owner / evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>C01</td>
+<td>Gate</td>
+<td>The site's purpose and primary action are clear; critical content is visible without broken loading states.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>C02</td>
+<td>Gate</td>
+<td>All intended routes, navigation, footer, logo links and buttons work; no unexplained placeholders, dead links or demo data.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>C03</td>
+<td>Gate</td>
+<td>Forms validate on the server, explain field errors, show progress and confirm success; duplicate submissions do not duplicate important actions.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>C04</td>
+<td>Gate</td>
+<td>Empty, loading, unavailable, permission-denied, 404 and failure states offer a useful next step without stack traces.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>C05</td>
+<td>Gate</td>
+<td>Prices, availability, service claims, contact methods and policy content match actual operations.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>C06</td>
+<td>Recommended</td>
+<td>Page titles, descriptions, favicon and sharing image are meaningful; footer year is maintained.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>C07</td>
+<td>Conditional gate</td>
+<td>All languages, dates, time zones, currencies, tax and rounding rules required by the audience work correctly.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>C08</td>
+<td>Optional</td>
+<td>Sticky CTAs, thank-you routes, chat widgets and animation are added only when useful; an accessible confirmation can be inline or on a receipt page.</td>
+<td>PENDING</td>
+</tr>
+</tbody>
+</table>
+<h2>2. Mobile, accessibility and performance</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Priority</th>
+<th>Acceptance criterion</th>
+<th>Status / owner / evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>U01</td>
+<td>Gate</td>
+<td>Essential journeys work at narrow widths and enlarged text; no unintended horizontal scrolling or clipped controls. Check portrait/landscape and a real phone.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>U02</td>
+<td>Gate</td>
+<td>Mobile menu opens/closes, exposes navigation, has an accessible name/state and can be operated without a mouse.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>U03</td>
+<td>Gate</td>
+<td>Keyboard navigation, focus visibility, labels, error associations and dialog focus behavior work for essential tasks.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>U04</td>
+<td>Gate</td>
+<td>Informative images have useful alternatives; decorative images use empty alt text; text has readable contrast and controls are usable by touch.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>U05</td>
+<td>Conditional gate</td>
+<td>Motion can be paused where required, reduced-motion preferences are respected, and meaningful audio/video has appropriate alternatives.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>U06</td>
+<td>Recommended</td>
+<td>Images have suitable dimensions/formats; noncritical images are deferred; critical hero content is not unnecessarily delayed. Videos do not dominate slow connections.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>U07</td>
+<td>Gate</td>
+<td>No critical JavaScript errors, missing assets or mixed-content failures. Critical flows work on the browsers the project supports.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>U08</td>
+<td>Recommended</td>
+<td>Measure loading, responsiveness and visual stability on representative mobile hardware/network conditions; record a budget and regressions.</td>
+<td>PENDING</td>
+</tr>
+</tbody>
+</table>
+<p>Responsive screenshots and automated accessibility tools cover only part of accessibility. W3C's <a href="https://www.w3.org/WAI/WCAG22/Understanding/reflow.html">reflow guidance</a> explains narrow/zoomed layouts and exceptions. Its <a href="https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide.html">pause, stop or hide guidance</a> covers automatically moving content. <a href="https://developer.mozilla.org/en-US/docs/Web/Performance/Guides/Lazy_loading">MDN's lazy-loading guide</a> explains deferring noncritical resources. Do not claim WCAG compliance from a single automated scan.</p>
+<h2>3. Security and privacy</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Priority</th>
+<th>Acceptance criterion</th>
+<th>Status / owner / evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S01</td>
+<td>Gate</td>
+<td>Production debug is off. Secrets are unique, private, absent from source/releases/logs, and access is limited to authorized operators.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>S02</td>
+<td>Gate</td>
+<td>Supported dependencies are locked and audited; findings are fixed or have a documented justified disposition. Include OS/container updates.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>S03</td>
+<td>Conditional gate</td>
+<td>Accounts use safe password storage, rate limiting, secure sessions and recovery; password changes invalidate old sessions where appropriate. Privileged access is protected.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>S04</td>
+<td>Conditional gate</td>
+<td>Each protected operation enforces server-side ownership/role checks, including guessed IDs, downloads and admin endpoints.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>S05</td>
+<td>Conditional gate</td>
+<td>State-changing requests have appropriate CSRF protection; user inputs cannot inject SQL, script, shell commands or unsafe redirect destinations.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>S06</td>
+<td>Conditional gate</td>
+<td>Uploads have size/type/content checks, safe filenames/storage and restricted execution; only approved content is publicly exposed.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>S07</td>
+<td>Gate</td>
+<td>HTTPS works; cookies and proxy trust match the architecture; origin/host handling and security headers are reviewed. Private services are not public.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>S08</td>
+<td>Conditional gate</td>
+<td>Collection, retention, sharing, deletion and access to personal data are documented and implemented as applicable. Policy text reflects actual behavior.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>S09</td>
+<td>Conditional gate</td>
+<td>Inventory cookies, local storage, SDKs, embedded media and trackers. Implement consent/preferences and blocking before consent where applicable.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>S10</td>
+<td>Gate</td>
+<td>Error and audit logs support investigation without exposing passwords, tokens or unnecessary personal data; incident and access-revocation owners are known.</td>
+<td>PENDING</td>
+</tr>
+</tbody>
+</table>
+<p>Use <a href="https://asvs.owasp.org/">OWASP ASVS</a> to scale verification to the application's risk. A dependency scan finds known advisories; it is not a penetration test. Consent requirements depend on technology, purpose and jurisdiction. For example, the UK's current <a href="https://ico.org.uk/for-organisations/direct-marketing-and-privacy-and-electronic-communications/guidance-on-the-use-of-storage-and-access-technologies/what-are-the-exceptions/">ICO exceptions guidance</a> distinguishes exempt uses and their conditions. Do not add a decorative “Accept” banner while tracking starts anyway, or assume a banner is universally required for an essential-session-only site.</p>
+<h2>4. Infrastructure and release engineering</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Priority</th>
+<th>Acceptance criterion</th>
+<th>Status / owner / evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>D01</td>
+<td>Gate</td>
+<td>Hosting supports the runtime/build and required storage, background jobs and resource limits; billing and renewal owners are recorded.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>D02</td>
+<td>Conditional gate</td>
+<td>Custom-domain DNS resolves correctly; intended hostname redirects consistently; HTTPS certificates cover all served names and renew automatically.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>D03</td>
+<td>Gate</td>
+<td>A clean build/install is reproducible from a reviewed release; artifacts contain no environment files, credentials, database dumps or customer data.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>D04</td>
+<td>Gate</td>
+<td>Development, test, staging and production configuration/data are separated. Staging is access-controlled, cannot contact real customers, and is excluded from indexing.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>D05</td>
+<td>Conditional gate</td>
+<td>Database migrations are versioned and tested on a representative restored copy; concurrent writes and transactional failures are handled correctly.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>D06</td>
+<td>Conditional gate</td>
+<td>Uploads and other user data survive redeploy/restart; storage permissions, quotas and disk alerts are correct.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>D07</td>
+<td>Gate</td>
+<td>Production process restarts after failure/reboot, exposes health/readiness checks and uses an appropriate production server or managed platform.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>D08</td>
+<td>Conditional gate</td>
+<td>Jobs have ownership, timeouts, retries and duplicate protection; queues are monitored and cron schedules do not overlap unexpectedly.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>D09</td>
+<td>Gate</td>
+<td>Previous release, configuration history and rollback procedure are available; data compatibility is explicitly assessed.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>D10</td>
+<td>Recommended</td>
+<td>CI runs suitable tests and validates release artifacts; protected deployment access and approval responsibilities fit the team.</td>
+<td>PENDING</td>
+</tr>
+</tbody>
+</table>
+<p>A dedicated production server or managed runtime is needed for a Flask application; its development server is unsuitable for production. See <a href="https://flask.palletsprojects.com/en/stable/deploying/">Flask's deployment documentation</a>. A static site does not need a Flask server merely to satisfy this checklist.</p>
+<h2>5. Data recovery, monitoring and support</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Priority</th>
+<th>Acceptance criterion</th>
+<th>Status / owner / evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>O01</td>
+<td>Conditional gate</td>
+<td>Persistent business data has encrypted/private backups away from the primary failure domain, with retention and backup-failure alerts.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>O02</td>
+<td>Conditional gate</td>
+<td>A recent backup has been restored in isolation; sample data/files and the application work. Record recovery time and achievable data loss.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>O03</td>
+<td>Gate</td>
+<td>A human receives and acknowledges a test outage alert. Monitor availability, errors, capacity and critical dependency failures.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>O04</td>
+<td>Conditional gate</td>
+<td>Transactional email sender authentication and controlled-inbox arrival are verified. Bounce/failure handling and retry ownership are defined.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>O05</td>
+<td>Gate</td>
+<td>Support channel is monitored; refund/privacy/security escalation and out-of-hours responsibility are assigned as appropriate.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>O06</td>
+<td>Recommended</td>
+<td>Review failed jobs, backups, stock, dependencies, certificates/domain renewal and bills on a documented schedule.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>O07</td>
+<td>Conditional gate</td>
+<td>Providers' limits, outages and cancellation/export paths are understood; failure does not silently lose important user actions.</td>
+<td>PENDING</td>
+</tr>
+</tbody>
+</table>
+<h2>Additional verification worksheet for any deployment</h2>
+<p>Use these checks where the relevant component exists. Record observed production values separately from local test results; a passing homepage is insufficient evidence for the backend.</p>
+<table>
+<thead>
+<tr>
+<th>Check</th>
+<th>What to inspect or exercise</th>
+<th>Required evidence / result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Exact runtime and dependency versions</td>
+<td>Compare local lock, deployed packages and OS/runtime support; test the actual production Python/Node/etc. version.</td>
+<td>Version inventory, install consistency and relevant tests.</td>
+</tr>
+<tr>
+<td>Startup and shutdown</td>
+<td>Start the real production server with isolated data; exercise concurrent reads and graceful termination.</td>
+<td>Exit status, failed requests and test limits. A small smoke load is not capacity certification.</td>
+</tr>
+<tr>
+<td>Configuration failures</td>
+<td>Invalid environment name, missing secret, insecure production cookies, debug/CSRF settings.</td>
+<td>Unsafe startup is rejected; secrets never appear in output.</td>
+</tr>
+<tr>
+<td>Readiness vs liveness</td>
+<td>Disconnect DB/cache, use an old schema, remove the upload mount.</td>
+<td>Readiness fails safely; process liveness is separate; no internal details exposed.</td>
+</tr>
+<tr>
+<td>Database behavior</td>
+<td>Clean/upgrade migrations, constraint violations, transaction rollback, simultaneous stock claims and overlapping workers.</td>
+<td>Tests on the same database family, plus rehearsal on a recent restored copy.</td>
+</tr>
+<tr>
+<td>Jobs and email</td>
+<td>Retry count/backoff, duplicate delivery risk, uncertain acceptance, stale queues and scheduler ownership.</td>
+<td>Bounded retry policy, reviewed recovery command, one scheduler, human failure alert and controlled inbox evidence.</td>
+</tr>
+<tr>
+<td>Backup and recovery</td>
+<td>SQL plus persistent files, checksums, off-server encryption/access, archive paths/links, retention and recovery time.</td>
+<td>Actual isolated restore; test sample records/files. Synthetic tests do not prove production recovery.</td>
+</tr>
+<tr>
+<td>Storage and resilience</td>
+<td>Free disk/inodes, log growth, release/backup working space, encryption, deletion protection and stable addressing.</td>
+<td>Explicit headroom threshold and alert; review destructive defaults and IP/DNS changes.</td>
+</tr>
+<tr>
+<td>Deployment execution</td>
+<td>One migration step, consistent worker environment, private DB/cache, persistent uploads, certificate renewal.</td>
+<td>Staging deployment and public smoke evidence; syntax validation alone is insufficient.</td>
+</tr>
+<tr>
+<td>Release hygiene</td>
+<td>Allowlisted source package, SHA-256/manifest, no customer data or secrets; no active QA/demo catalogue.</td>
+<td>Reproducible build instructions, verified archive and reviewed live content.</td>
+</tr>
+<tr>
+<td>Logs and monitoring</td>
+<td>Reset tokens/query strings, PII, retention/access, uptime, disk, queue and backup failure.</td>
+<td>Redaction plus a test alert acknowledged by its recipient.</td>
+</tr>
+<tr>
+<td>Cost and ownership</td>
+<td>Static IP, storage/snapshots, backup retention, messaging, bandwidth and renewal.</td>
+<td>Agreed spending limits and an operational owner; never infer approval to create billable resources.</td>
+</tr>
+</tbody>
+</table>
+<p>A test that timed out, was skipped, mocked an external dependency or ran on another database must retain that limitation in the report. Keep blockers separate from optional features and distinguish source changes from deployed changes.</p>
+<h2>6. Extra gates for commerce</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Acceptance criterion</th>
+<th>Status / owner / evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>E01</td>
+<td>Product variants, stock, images, total price, shipping and applicable tax are accurate. Server recalculates totals; overselling and repeat checkout are tested.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>E02</td>
+<td>Selected payment method works end to end. Online payments require verified provider configuration, signed callbacks, replay/duplicate handling and refund reconciliation. COD requires receipt/remittance reconciliation instead.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>E03</td>
+<td>Serviceable regions/PIN codes, courier handoff, tracking, dispatch timing, failed delivery/RTO and damaged/returned goods have a working process.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>E04</td>
+<td>Order states, cancellations and returns preserve stock and accounting correctly; receipts/bills describe actual tax status.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>E05</td>
+<td>Applicable business identity, address, grievance/support contacts, shipping, return/refund and terms disclosures are accurate and reachable.</td>
+<td>PENDING</td>
+</tr>
+<tr>
+<td>E06</td>
+<td>Owner can fulfil a controlled test order, answer support, process cancellation/return and reconcile payment without developer intervention.</td>
+<td>PENDING</td>
+</tr>
+</tbody>
+</table>
+<p>For an India-facing e-commerce business, review the applicable provisions of the official <a href="https://consumeraffairs.gov.in/public/upload/files/E%20commerce%20rules_1732703966.pdf">Consumer Protection (E-Commerce) Rules</a>, including business/contact disclosures and grievance handling. Business model, tax registration and current legal obligations need factual owner/professional confirmation. Never invent a registration number or copy another store's address/policies to fill a blank.</p>
+<h2>7. Search and discoverability — separate from deployment</h2>
+<p>Check meaningful public titles/descriptions, canonical URLs, relevant content, crawlable navigation, robots rules, an accurate sitemap and appropriate structured data. Keep admin, account, cart and test pages out of search. <code>noindex</code> is not authorization. Sharing metadata helps social previews; it does not make a broken page usable.</p>
+<p>Search-console verification, sitemap submission, merchant listings, advertising, business profiles and analytics are follow-up integrations selected for the project. A public site can accept direct visitors before any of those are configured. Product feeds need actual current products, prices, stock and valid image URLs. Never promise an indexing date or search ranking.</p>
+<h2>8. Evidence and sign-off</h2>
+<p>Minimum evidence set: release identifier/checksum; relevant automated test output; manual journey results; supported-browser/device list; dependency/security review; production configuration check; migration/restore rehearsal; public smoke results; controlled email/payment or COD evidence; monitoring test; owner-approved disclosures. Redact personal data and secrets from all shared evidence.</p>
+<table>
+<thead>
+<tr>
+<th>Gate</th>
+<th>Decision</th>
+<th>Evidence / owner</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Source, dependencies and package verified</td>
+<td>PENDING</td>
+<td></td>
+</tr>
+<tr>
+<td>All critical journeys pass</td>
+<td>PENDING</td>
+<td></td>
+</tr>
+<tr>
+<td>Applicable security/privacy/business gates pass</td>
+<td>PENDING</td>
+<td></td>
+</tr>
+<tr>
+<td>Data recovery and rollback proven</td>
+<td>PENDING</td>
+<td></td>
+</tr>
+<tr>
+<td>Production runtime, HTTPS, jobs and alerts verified</td>
+<td>PENDING</td>
+<td></td>
+</tr>
+<tr>
+<td>Support/fulfilment owner accepts handover</td>
+<td>PENDING</td>
+<td></td>
+</tr>
+<tr>
+<td>Final decision and date</td>
+<td>GO / NO-GO / LIMITED PREVIEW</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Do not mark GO while an applicable gate is unknown. A limited preview can be appropriate if access and features are deliberately restricted. Record deferred optional improvements separately from unresolved blockers.</p>
+<h3>Defect and exception register</h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Problem / affected users</th>
+<th>Severity</th>
+<th>Owner</th>
+<th>Required action</th>
+<th>Evidence / target date</th>
+<th>Release decision</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SAMPLE</td>
+<td>Replace with an actual finding</td>
+<td>Critical / high / medium / low</td>
+<td>Name</td>
+<td>Concrete fix</td>
+<td>Link/date</td>
+<td>Block / accepted limitation / later</td>
+</tr>
+</tbody>
+</table>
+<h3>Release-day sequence</h3>
+<ol>
+<li>Confirm scope, release ID, owners, backup and maintenance window.</li>
+<li>Complete staging acceptance and recovery rehearsal.</li>
+<li>Deploy approved source/configuration and migrations with writes controlled.</li>
+<li>Verify readiness, HTTPS, critical journeys, persistent media and jobs.</li>
+<li>Verify real alert receipt and controlled transactional communication.</li>
+<li>Open public access only after sign-off; watch errors and user feedback.</li>
+<li>Roll back promptly if critical acceptance fails, preserving new business records.</li>
+</ol>
+<h3>Cost worksheet</h3>
+<p>Record estimates and renewal owners for domain, hosting/compute, database, storage/backups, bandwidth/CDN, email, monitoring and support. Add payment/courier fees for commerce, and licensing/tax/legal review when needed. Some may be included or free at your scale; avoid buying a service solely because a social-media checklist names it. Set budget alerts and review scale assumptions before launch.</p>
+<h2>How the two Instagram checklists fit</h2>
+<p>The <a href="https://www.instagram.com/p/DcKiRe3TvdB/">first post</a> highlights layout, navigation, basic metadata and form feedback. The <a href="https://www.instagram.com/p/DfShMOkPXQW/">second post</a> adds discoverability, policies, optional tracking and a promoted service. These are useful prompts, not a complete deployment standard. The detailed AURK companion report maps every listed item to a result. This template additionally covers configuration, security, concurrency, durable data, recovery, monitoring, fulfilment and ownership—the work that makes a public website dependable after the launch screen looks correct.</p>
+</main></body></html>

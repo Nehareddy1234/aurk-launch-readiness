@@ -1,0 +1,5 @@
+{% if product.product_status == 'coming_soon' %}
+<span class="availability-badge coming-soon-badge"><span class="coming-soon-dot" aria-hidden="true"></span><span>COMING SOON</span></span>
+{% else %}
+<span class="availability-badge">{{ product.status_label|upper }}</span>
+{% endif %}

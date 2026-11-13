@@ -1,0 +1,93 @@
+/* Final storefront layout layer: compact phones through wide desktop screens. */
+.storefront-theme { --page-gutter: clamp(16px, 4vw, 64px); }
+.storefront-theme main { min-width: 0; }
+.storefront-theme [id] { scroll-margin-top: 160px; }
+.storefront-theme :is(input, select, textarea) { max-width: 100%; }
+.storefront-theme :is(.container, .shop-page) { width: 100%; max-width: 1440px; padding-inline: var(--page-gutter); }
+.storefront-theme :is(.home-product-grid, .product-grid) { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px 20px; }
+.storefront-theme :is(.home-product-card, .product-card, .shop-search, .shop-toolbar form, .checkout-item > div) { min-width: 0; }
+.storefront-theme :is(.home-product-meta, .product-card-info, .commerce-card, .form-card) { overflow-wrap: anywhere; }
+.storefront-theme :is(.button, .category-pill, .text-button, .site-menu-toggle) { min-height: 44px; }
+.storefront-theme :is(.button, .category-pill) { display: inline-flex; align-items: center; justify-content: center; text-align: center; }
+.storefront-theme :is(.quick-add select, .quick-add input, .form-card input, .form-card textarea) { min-width: 0; font-size: 16px; }
+.storefront-theme .form-card { width: min(520px, calc(100% - 32px)); margin: clamp(32px, 6vw, 70px) auto; }
+.storefront-theme .aurk-editorial-header { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 20px; transition: box-shadow .25s ease, border-color .25s ease; border-bottom: 1px solid transparent; }
+.storefront-theme .aurk-editorial-header[data-scrolled="true"] { border-bottom-color: var(--line); box-shadow: 0 8px 24px #0003; }
+.storefront-theme .aurk-editorial-header nav a { min-height: 44px; display: inline-flex; align-items: center; }
+.storefront-theme .aurk-header-actions { min-width: 0; }
+.storefront-theme .aurk-header-actions form { margin: 0; }
+.storefront-theme .aurk-header-actions button { min-height: 44px; }
+.storefront-theme .site-footer nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 24px; }
+.storefront-theme .site-footer nav a { min-height: 44px; display: flex; align-items: center; }
+.storefront-theme .pagination { flex-wrap: wrap; gap: 12px; }
+.storefront-theme .storefront-section { padding-top: clamp(40px, 6vw, 78px); }
+.storefront-theme .home-cod-story { padding: clamp(24px, 4vw, 48px); gap: clamp(24px, 4vw, 60px); }
+.storefront-theme :is(.home-product-card, .product-card) { transition: border-color .25s ease, box-shadow .25s ease; }
+@media (hover: hover) and (pointer: fine) {
+  .storefront-theme :is(.home-product-card, .product-card):hover { border-color: #746650; box-shadow: 0 10px 30px #0003; }
+  .storefront-theme :is(.home-product-image, .product-card-image):hover img { transform: scale(1.025); }
+}
+@media (min-width: 1025px) {
+  .storefront-theme .aurk-artwork-square { width: clamp(180px, 18vw, 260px); }
+  .storefront-theme .aurk-editorial-header nav { gap: clamp(12px, 1.5vw, 26px); }
+  .storefront-theme .checkout-summary { top: 150px; }
+}
+@media (max-width: 1024px) {
+  .storefront-theme .aurk-topline { gap: 12px; letter-spacing: .16em; }
+  .storefront-theme .aurk-topline span:nth-child(2) { display: none; }
+  .storefront-theme .aurk-editorial-header { grid-template-columns: 1fr auto; padding: 12px var(--page-gutter); min-height: 80px; gap: 8px 16px; align-items: center; }
+  .storefront-theme .aurk-editorial-header .logo { grid-column: 1; justify-self: start; }
+  .storefront-theme .aurk-artwork-square { width: 160px; }
+  .storefront-theme .aurk-header-actions { grid-column: 2; gap: 4px; max-width: none; flex-wrap: nowrap; }
+  .storefront-theme .aurk-header-actions a { min-width: 44px; min-height: 44px; }
+  .storefront-theme .aurk-header-actions form { flex-basis: auto; }
+  .storefront-theme .aurk-editorial-header .site-menu-toggle:not([hidden]) { display: block; grid-column: 1 / -1; grid-row: 2; justify-self: stretch; padding: 10px 14px; border: 1px solid var(--line); border-radius: 4px; text-align: left; }
+  .storefront-theme .site-menu-toggle::after { content: '+'; float: right; }
+  .storefront-theme .site-menu-toggle[aria-expanded="true"]::after { content: '\2212'; }
+  .storefront-theme .aurk-editorial-header nav { grid-column: 1 / -1; grid-row: 3; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; padding: 8px 0; gap: 8px; max-height: 40svh; overflow-y: auto; }
+  .storefront-theme .aurk-editorial-header[data-menu-open="false"] nav { display: none; }
+  .storefront-theme .aurk-editorial-header nav a { justify-content: center; font-size: 11px; letter-spacing: .1em; }
+  .storefront-theme :is(.home-product-grid, .product-grid) { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px 14px; }
+  .storefront-theme .quick-add .separate-variant-fields { grid-template-columns: 1fr; }
+  .storefront-theme .quick-add-action { flex-wrap: wrap; }
+  .storefront-theme .quick-add-action .button { flex-basis: 100%; }
+  .storefront-theme .checkout-layout { grid-template-columns: 1fr; }
+  .storefront-theme .checkout-summary { position: static; }
+}
+@media (max-width: 760px) {
+  .storefront-theme :is(.home-product-grid, .product-grid) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .storefront-theme .shop-header { flex-direction: column; align-items: stretch; }
+  .storefront-theme .shop-search input { width: 100%; min-width: 0; }
+  .storefront-theme .shopping-product-layout { grid-template-columns: 1fr; }
+  .storefront-theme .aurk-campaign { min-height: 440px; height: clamp(440px, 75svh, 650px); max-height: none; aspect-ratio: auto; padding: 32px var(--page-gutter); align-items: flex-end; }
+  .storefront-theme .aurk-campaign-copy { padding-bottom: 48px; }
+  .storefront-theme .aurk-campaign-copy h1 { font-size: clamp(34px, 8vw, 60px); letter-spacing: .1em; }
+  .storefront-theme .aurk-campaign-copy p { line-height: 1.8; font-size: 10px; letter-spacing: .16em; }
+  .storefront-theme .aurk-campaign-shade { background: linear-gradient(0deg, #000f, #0009 45%, #0001); }
+  .storefront-theme .aurk-campaign-side { display: none; }
+  .storefront-theme .delivery-grid { grid-template-columns: 1fr; }
+  .storefront-theme .storefront-benefits { gap: 10px 20px; font-size: 12px; text-align: center; }
+  .storefront-theme .site-footer { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  .storefront-theme .aurk-artwork-square { width: 110px; }
+  .storefront-theme .aurk-editorial-header { gap: 8px; }
+  .storefront-theme .aurk-header-actions { gap: 0; flex-wrap: wrap; max-width: 132px; }
+  .storefront-theme .aurk-header-actions form { flex-basis: 100%; text-align: right; }
+  .storefront-theme .aurk-header-actions button { padding: 8px 4px; }
+  .storefront-theme .aurk-editorial-header nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .storefront-theme :is(.home-product-meta, .product-card-info) { padding: 12px; }
+  .storefront-theme .product-category { font-size: 11px; }
+  .storefront-theme .availability-badge { font-size: 10px; padding: 8px; letter-spacing: .05em; }
+  .storefront-theme .shop-toolbar form { width: 100%; }
+  .storefront-theme .shop-toolbar select { width: 100%; }
+  .storefront-theme .shopping-cart-item { padding: 16px; gap: 12px; grid-template-columns: 60px minmax(0, 1fr); }
+  .storefront-theme .shopping-cart-image { width: 60px; height: 80px; }
+  .storefront-theme .commerce-card { padding: 20px; }
+}
+@media (max-width: 359px) {
+  .storefront-theme :is(.home-product-grid, .product-grid, .home-collections) { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .storefront-theme *, .storefront-theme *::before, .storefront-theme *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}

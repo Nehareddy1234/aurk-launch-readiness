@@ -1,0 +1,12 @@
+[Unit]
+Description=Check AURK application readiness
+After=network-online.target
+OnFailure=aurk-alert@%n.service
+[Service]
+Type=oneshot
+User=ubuntu
+WorkingDirectory=/home/ubuntu/Aurk
+Environment=FLASK_CONFIG=production
+ExecStart=/home/ubuntu/Aurk/.venv/bin/python /home/ubuntu/Aurk/scripts/check_host_health.py --uploads /home/ubuntu/Aurk/instance/uploads
+ExecStart=/usr/bin/curl --fail --silent --show-error --max-time 10 https://aurk.in/api/ready
+ExecStart=/home/ubuntu/Aurk/.venv/bin/python -m flask --app wsgi:app check-operations

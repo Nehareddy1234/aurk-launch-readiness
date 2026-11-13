@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Phone sign-in &mdash; AURK{% endblock %}
+{% block content %}<section class="form-card"><h1>Phone sign-in</h1>
+<p>Add a number to sign in with your existing password. This does not change your delivery phone number. Leave it blank to remove phone sign-in.</p>
+<form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<label>Login phone number<input type="tel" name="phone" autocomplete="tel" placeholder="+91" value="{{ request.form.get('phone', current_user.login_phone or '') }}"></label>
+<label>Current password<input type="password" name="password" autocomplete="current-password" required></label>
+<button class="button">Save phone sign-in</button></form>
+<p>Joined with Google? <a href="{{ url_for('auth.forgot_password') }}">Set a password by email first.</a></p>
+<a href="{{ url_for('orders.list_orders') }}">Back to my orders</a></section>{% endblock %}

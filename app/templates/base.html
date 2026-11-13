@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+{% set seo = seo_metadata(product|default(none), selected_category|default(none)) %}
+<title>{% block title %}{{ seo.title }}{% endblock %}</title>
+<meta name="description" content="{% block description %}{{ seo.description }}{% endblock %}">
+{% if seo.noindex %}<meta name="robots" content="noindex,nofollow">{% endif %}
+{% if seo.canonical %}<link rel="canonical" href="{{ seo.canonical }}"><meta property="og:url" content="{{ seo.canonical }}">{% endif %}
+<meta property="og:title" content="{{ seo.title }}"><meta property="og:description" content="{{ seo.description }}"><meta property="og:type" content="{{ seo.type }}"><meta property="og:site_name" content="AURK">
+<meta name="twitter:card" content="summary_large_image">
+{% if seo.image %}<meta property="og:image" content="{{ seo.image }}">{% endif %}
+{% if config.GOOGLE_SITE_VERIFICATION %}<meta name="google-site-verification" content="{{ config.GOOGLE_SITE_VERIFICATION }}">{% endif %}
+{% for item in seo.structured %}<script type="application/ld+json" nonce="{{ g.csp_nonce }}">{{ item|tojson }}</script>{% endfor %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/premium.css') }}">
+<script src="{{ url_for('static', filename='js/app.js', v='20261105-launch') }}" defer></script>
+<script src="{{ url_for('static', filename='js/motion.js', v='20261013') }}" defer></script>
+<script src="{{ url_for('static', filename='js/header.js') }}" defer></script>
+<link rel="icon" type="image/png" href="{{ url_for('static', filename='images/brand/site-icon.png', v='20261028') }}"><link rel="stylesheet" href="{{ url_for('static', filename='css/aurk.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/storefront-motion.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/product-gallery.css', v='20261025-original-size') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/brand-polish.css', v='20261019-cursor') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/cover-video.css', v='20261105-launch') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/notify.css', v='20261025-launch-badge') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/confirmation.css', v='20261013') }}"><script src="{{ url_for('static', filename='js/confirmation.js', v='20261013') }}" defer></script><link rel="stylesheet" href="{{ url_for('static', filename='css/account.css', v='20261019') }}"><link rel="stylesheet" href="{{ url_for('static', filename='css/community.css', v='20261019') }}"><link rel="stylesheet" href="{{ url_for('static', filename='css/storefront-content.css', v='20261105-launch') }}"><script src="{{ url_for('static', filename='js/storefront-content.js', v='20261105-launch') }}" defer></script><link rel="stylesheet" href="{{ url_for('static', filename='css/size-chart.css', v='20261025') }}"><script src="{{ url_for('static', filename='js/size-chart.js', v='20261025') }}" defer></script>{% block page_head %}{% endblock %}</head>
+<body class="storefront-theme {% block body_class %}{% endblock %}">
+{% include "_announcement.html" %}
+<div class="aurk-topline"><span>INDIAN / STREETWEAR</span><span>PEOPLE &nbsp; PLACES &nbsp; STORIES &nbsp; BEYOND</span><span>A BIGGER TOMORROW</span></div>
+<a class="skip-link" href="#main-content">Skip to content</a>
+<header id="aurk-header" class="nav site-header aurk-editorial-header">
+<a class="logo" href="{{ url_for('main.home') }}" aria-label="AURK home"><span class="header-logo-frame"><img src="{{ url_for('static', filename='images/brand/header-logo.png') }}" alt="AURK" width="2000" height="2000" fetchpriority="high"></span></a>
+<button class="site-menu-toggle" type="button" aria-expanded="false" aria-controls="store-navigation" hidden>Menu</button>
+<nav id="store-navigation" aria-label="Main navigation"><a href="{{ url_for('products.shop') }}">Shop</a><a href="{{ url_for('main.home') }}#collections">Collections</a><a href="{{ url_for('community.gallery') }}">Worn by you</a><a href="{{ url_for('main.contact') }}">Contact</a></nav>
+<div class="aurk-header-actions"><a href="{{ url_for('products.search') }}" aria-label="Search products"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m15 15 6 6"/></svg></a><a href="{{ url_for('orders.dashboard') if current_user.is_authenticated else url_for('auth.login') }}" aria-label="{{ 'My account' if current_user.is_authenticated else 'Sign in' }}"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7" r="4"/><path d="M4 22v-3a8 8 0 0 1 16 0v3Z"/></svg></a><a href="{{ url_for('cart.view') }}" aria-label="Your bag"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16l1 14H3ZM8 9V6a4 4 0 0 1 8 0v3"/></svg></a>{% if current_user.is_authenticated %}<form method="post" action="{{ url_for('auth.logout') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit">Sign out</button></form>{% endif %}</div>
+</header>
+{% with messages=get_flashed_messages(with_categories=true) %}{% for category,message in messages %}<div class="flash {{ category }}" role="{{ 'alert' if category == 'error' else 'status' }}">{{ message }}</div>{% endfor %}{% endwith %}
+<main id="main-content" tabindex="-1">{% block content %}{% endblock %}</main>
+<footer class="site-footer"><div class="footer-brand"><a class="logo footer-logo" href="{{ url_for('main.home') }}" aria-label="AURK home"><img src="{{ url_for('static', filename='images/brand/footer-logo.png') }}" alt="AURK" width="2000" height="2000" loading="lazy"></a></div><nav aria-label="Footer navigation"><a href="{{ url_for('products.shop') }}">Shop all</a><a href="{{ url_for('main.about') }}">About us</a><a href="{{ url_for('cart.view') }}">Your bag</a><a href="{{ url_for('main.contact') }}">Contact us</a><a href="{{ url_for('main.shipping') }}">Shipping</a><a href="{{ url_for('main.returns') }}">Returns &amp; exchanges</a><a href="{{ url_for('main.refund_policy') }}">Refunds</a><a href="{{ url_for('main.privacy') }}">Privacy</a><a href="{{ url_for('main.terms') }}">Terms</a><a href="{{ url_for('orders.list_orders') }}">Track your orders</a></nav><div class="footer-bottom"><span>&copy; {{ current_year }} AURK</span><span>Cash on delivery</span></div></footer>
+{% include "shop/_size_chart.html" %}
+</body></html>

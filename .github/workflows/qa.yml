@@ -1,0 +1,50 @@
+name: AURK isolated QA
+"on":
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.11', '3.14']
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: qa-only-password
+          MYSQL_DATABASE: aurk_qa_test
+          MYSQL_USER: aurk_qa
+          MYSQL_PASSWORD: qa-only-password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -pqa-only-password"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      TEST_DATABASE_URL: mysql+pymysql://aurk_qa:qa-only-password@127.0.0.1:3306/aurk_qa_test
+      SECRET_KEY: qa-only-secret-not-production
+      DATABASE_URL: 'sqlite:///:memory:'
+      CUSTOMER_EMAILS_ENABLED: 'false'
+      MAIL_SERVER: ''
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: pip install -r requirements-test.txt -c requirements-lock.txt
+      - run: python -m pip check
+      - run: python -m playwright install --with-deps chromium
+      - run: python -m scripts.run_qa browser-setup
+      - run: python -m scripts.run_qa coverage --seed 101
+      - name: Retain honest QA results, including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: aurk-qa-results-${{ matrix.python }}
+          path: qa_artifacts/

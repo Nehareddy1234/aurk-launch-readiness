@@ -1,0 +1,38 @@
+{% extends "admin/base.html" %}
+{% block title %}List a product — AR Drips{% endblock %}
+{% block content %}
+<section class="form-card">
+<h1>List a product</h1>
+<p class="form-help">Add the details, photos and stock below. Save once and your product is ready.</p>
+{% if error %}<div class="alert alert-error" role="alert">{{ error }} Your details are kept below; please choose the photos again.</div>{% endif %}
+{% if not categories %}<div class="alert alert-error">Create a category before listing your first product.{% if current_user.has_permission('products.update') %} <a href="{{ url_for('admin.edit_category') }}">Create category</a>{% endif %}</div>{% endif %}
+<form method="post" enctype="multipart/form-data">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<input type="hidden" name="quick_listing" value="1">
+<h2>1. Product details</h2>
+<label>Product name<input name="name" maxlength="255" placeholder="e.g. Classic black T-shirt" value="{{ request.form.get('name','') }}" required></label>
+<label>Availability<select name="product_status">{% for value,label in [('available','Available'),('coming_soon','Coming soon'),('out_of_stock','Out of stock')] %}<option value="{{ value }}" {% if request.form.get('product_status','available') == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>
+{% include 'admin/_product_pricing.html' %}
+<label>Category<select name="category_id" required><option value="">Choose a category</option>{% for category in categories %}<option value="{{ category.id }}" {% if request.form.get('category_id', categories[0].id|string if categories|length == 1 else '') == category.id|string %}selected{% endif %}>{{ category.name }}</option>{% endfor %}</select></label>
+<label>Description (optional)<textarea name="description" maxlength="10000" rows="3" placeholder="Material, fit and care instructions">{{ request.form.get('description','') }}</textarea></label>
+<h2>2. Photos</h2>
+<p class="form-help"><strong>Recommended photo size: 1200 × 1500 pixels (4:5 portrait).</strong> Use JPG, PNG or WEBP. Keep each photo around 200–500 KB and the entire upload under 100 MB. Upload front, back, side and detail views together; the first photo is the cover. Size charts can use their original proportions.</p>
+<p class="form-help">Choose up to 10 photos and MP4 videos. Photos can be up to 8 MB each; videos up to 25 MB each. Keep the total upload under 100 MB. Add a photo for the product cover.</p>
+<label>Product photos and videos<input type="file" name="images" data-image-upload data-existing-count="{{ product.images|length if product else 0 }}" accept="image/jpeg,image/png,image/webp,video/mp4,.mp4" multiple required><p class="form-help">Select several photos together, or choose more photos in another selection. Up to 10 photos and videos per product. MP4 videos: up to 25 MB each. Photos: up to 8 MB each. Total upload: under 100 MB.</p><div data-upload-list aria-live="polite"></div></label>
+<h2>3. Sizes and stock</h2>
+<fieldset class="admin-size-picker"><legend>Choose the sizes you sell</legend><div class="admin-size-buttons">{% for size in ['XS','S','M','L','XL','XXL','3XL','4XL','One size'] %}<label><input type="checkbox" name="sizes" value="{{ size }}" {% if size in request.form.getlist('sizes') %}checked{% endif %}><span>{{ size }}</span></label>{% endfor %}</div></fieldset>
+<label>Other size (optional)<input name="custom_size" maxlength="30" placeholder="e.g. 32 or 6–7 years" value="{{ request.form.get('custom_size','') }}"></label>
+<label>Colour<input name="color_name" maxlength="50" placeholder="e.g. Black" value="{{ request.form.get('color_name','') }}" required></label>
+<label>Stock for each selected size<input type="number" name="quantity" min="0" max="1000000" value="{{ request.form.get('quantity','0') }}" required></label>
+<p class="form-help">S, M and L with stock 5 means 5 of each size. You can adjust individual quantities or add more colours after saving.</p>
+<details {% if error %}open{% endif %}><summary>Optional settings</summary>
+
+<label><input type="checkbox" name="is_active" value="1" {% if request.method != 'POST' or request.form.get('is_active') == '1' %}checked{% endif %}> Show in shop</label>
+{% for field,label in [('is_featured','Featured'),('is_new_arrival','New arrival'),('is_bestseller','Bestseller')] %}<label><input type="checkbox" name="{{ field }}" value="1" {% if request.form.get(field) == '1' %}checked{% endif %}> {{ label }}</label>{% endfor %}
+<p class="form-help">The product link and stock codes are created automatically.</p>
+</details>
+<button type="submit" class="button" {% if not categories %}disabled{% endif %}>Save product &amp; stock</button>
+<a class="button button-secondary" href="{{ url_for('admin.products') }}">Cancel</a>
+</form>
+</section>
+{% endblock %}

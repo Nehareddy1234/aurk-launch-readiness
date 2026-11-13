@@ -1,0 +1,178 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>AWS backend and data verification</title><style>body{margin:0;background:#f4f5f7;color:#17202b;font:16px/1.65 system-ui,-apple-system,Segoe UI,sans-serif}main{max-width:1100px;margin:32px auto;background:white;padding:40px 48px;border:1px solid #dde2e8;border-radius:12px}h1,h2,h3{line-height:1.2;color:#112840}h1{font-size:34px}h2{margin-top:2em;padding-top:.6em;border-top:1px solid #d9e1ea}h3{margin-top:1.6em}a{color:#075ca8}table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.5;margin:20px 0}th,td{padding:11px 12px;border:1px solid #d9e1ea;text-align:left;vertical-align:top;overflow-wrap:anywhere}th{background:#edf3f9}tr:nth-child(even){background:#fafbfd}pre{overflow:auto;padding:18px;background:#edf3f9;border-radius:6px}code{font-size:.9em}li{margin:.5em 0}.note{color:#536477;font-size:13px}@media(max-width:700px){main{margin:0;padding:24px 14px;border:0;border-radius:0}h1{font-size:27px}table{font-size:12px}td,th{padding:7px 5px}}@media print{body{background:white;font-size:10pt}main{max-width:none;margin:0;padding:0;border:0}h2{break-after:avoid}tr{break-inside:avoid}a{color:#17202b}pre{white-space:pre-wrap}}</style></head><body><main><h1>AWS backend and live data verification</h1>
+<p>Verified 6 November 2026, approximately 23:15 IST, on the existing AURK EC2 server in ap-south-2. This is a read-only live inspection, distinct from the earlier isolated automated suites. No deployment, database changes, test accounts/orders, stock changes, customer messages or cloud resource changes were made. The SSM session was terminated normally. Google accounts were not accessed.</p>
+<h2>Result</h2>
+<p><strong>The inspected live backend is responding, and the existing records passed the consistency checks listed below. This is not full commercial-launch sign-off.</strong> The readiness endpoint is still missing, five active QA products remain, and the previously documented storage, backup and deployment gates are still open.</p>
+<h2>Actual data inspected</h2>
+<table>
+<thead>
+<tr>
+<th>Record type</th>
+<th style="text-align:right">Count</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>users</td>
+<td style="text-align:right">4</td>
+</tr>
+<tr>
+<td>products</td>
+<td style="text-align:right">22</td>
+</tr>
+<tr>
+<td>product_variants</td>
+<td style="text-align:right">105</td>
+</tr>
+<tr>
+<td>inventory</td>
+<td style="text-align:right">105</td>
+</tr>
+<tr>
+<td>orders</td>
+<td style="text-align:right">4</td>
+</tr>
+<tr>
+<td>order_items</td>
+<td style="text-align:right">6</td>
+</tr>
+<tr>
+<td>payments</td>
+<td style="text-align:right">4</td>
+</tr>
+<tr>
+<td>customer_emails</td>
+<td style="text-align:right">9</td>
+</tr>
+<tr>
+<td>order_notifications</td>
+<td style="text-align:right">4</td>
+</tr>
+</tbody>
+</table>
+<p>Only aggregate counts were returned. No names, email addresses, phone numbers, shipping addresses, order identifiers, passwords, password hashes or credential values were printed or exported.</p>
+<h2>Database integrity checks</h2>
+<p>The checks found <strong>zero anomalies</strong> for all of the following:</p>
+<ul>
+<li>Orphaned references across 42 declared foreign-key relationships.</li>
+<li>Negative stock, negative reservations, reservations exceeding stock, or variants without inventory records.</li>
+<li>Invalid cart/order-item quantities, negative order monetary components, negative product/variant prices or sale prices above base prices.</li>
+<li>Order total versus subtotal minus discount plus shipping/tax, order subtotal versus item quantities/prices, and item line-total arithmetic.</li>
+<li>Orders with no items/payment records, payment amount/currency mismatches, unknown order status, or paid payments on cancelled orders.</li>
+<li>Paid payments missing their payment timestamp and pending payments on cancelled orders.</li>
+<li>Failed/stale customer notification queues, pending/failed owner alerts or unsent product-interest alerts.</li>
+<li>Blank password storage or password values outside the expected scrypt/PBKDF2 formats. This checks storage format, not actual password strength or login correctness.</li>
+</ul>
+<p>All inspected database tables use InnoDB and foreign-key checking is enabled. Queries used read-only transactions, a 3-second per-query execution limit, and rollback/close. A final connection also explicitly set and verified session read-only mode. No CHECK/REPAIR TABLE, writes, schema changes or database reset were executed.</p>
+<p>There are <strong>five active QA-marked catalogue products</strong>. Their presence remains a launch/content issue. Review/archive them through an approved process while preserving order history; this inspection did not alter them.</p>
+<h2>Stored media</h2>
+<table>
+<thead>
+<tr>
+<th>Reference set</th>
+<th style="text-align:right">Checked</th>
+<th style="text-align:right">Missing</th>
+<th style="text-align:right">Unsafe paths</th>
+<th style="text-align:right">Empty files</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Product images</td>
+<td style="text-align:right">50</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">0</td>
+</tr>
+<tr>
+<td>Customer photos</td>
+<td style="text-align:right">2</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">0</td>
+</tr>
+<tr>
+<td>Storefront media</td>
+<td style="text-align:right">3</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">Not measured</td>
+</tr>
+</tbody>
+</table>
+<p>All 55 referenced media paths resolve to existing files inside the configured upload directory. No file was copied, edited or removed. Presence/path/size checks do not prove image/video decoding integrity or recoverability from backup.</p>
+<h2>Running backend and access protection</h2>
+<p>Direct requests were made to the existing loopback Gunicorn service with the production host header. Requests were serial and light; this was not a load test.</p>
+<table>
+<thead>
+<tr>
+<th>Route/check</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/api/health</code></td>
+<td>200</td>
+</tr>
+<tr>
+<td><code>/shop</code></td>
+<td>200</td>
+</tr>
+<tr>
+<td><code>/auth/login</code></td>
+<td>200</td>
+</tr>
+<tr>
+<td>Deliberately nonexistent URL</td>
+<td>Correct 404</td>
+</tr>
+<tr>
+<td><code>/api/ready</code></td>
+<td><strong>404 — new release still undeployed</strong></td>
+</tr>
+<tr>
+<td><code>/admin/</code>, <code>/admin/orders</code>, <code>/admin/products</code> without login</td>
+<td>302 to <code>/admin/login</code></td>
+</tr>
+<tr>
+<td><code>/account/</code>, <code>/account/orders</code> without login</td>
+<td>302 to <code>/auth/login</code></td>
+</tr>
+<tr>
+<td>App service</td>
+<td>Active/running; systemd NRestarts=0 at inspection</td>
+</tr>
+<tr>
+<td>Current installed Nginx configuration</td>
+<td><code>nginx -t</code> passed; no reload performed</td>
+</tr>
+</tbody>
+</table>
+<p>The initial HTTP client followed redirects; a second check explicitly disabled redirects to verify the five access-control responses above. No authenticated account access or CSRF-protected POST was exercised.</p>
+<h2>Sanitized operational evidence</h2>
+<ul>
+<li>The application journal returned 393 lines for the last 24 hours, within a 2,000-line cap. It contained no traceback marker and no ERROR/CRITICAL-marked line in that sample.</li>
+<li>The Nginx access-log sample contained 609 recognizable status records, <strong>zero 5xx</strong> and 362 4xx responses. A stricter request-line parser matched 607 records; its statuses were 190 × 200, 344 × 404, 41 × 301, 13 × 400, 3 × 405, 13 × 206 and 3 × 302.</li>
+<li>Of the stricter parser's 4xx results, 103 involved common probe paths such as WordPress/environment-file locations, 21 involved the known missing readiness/robots/sitemap/feed routes, and 236 were other requests not individually investigated. A 4xx count alone is not proof of an application fault or compromise.</li>
+</ul>
+<p>Log bodies, visitor IPs, URLs with query strings and customer information were not exported. Sampling, log rotation and logging configuration limit these conclusions; this is not a claim of zero historical failures.</p>
+<h2>What remains for full AWS backend acceptance</h2>
+<p>These checks inspect current records; four existing orders cannot establish every order/refund/concurrency path. The next test stage must use an isolated AWS environment with synthetic data and outbound SMTP/payment/courier actions disabled:</p>
+<ol>
+<li>Install the prepared locked release and run clean migrations to <code>d4ab72cd5610</code> on a dedicated QA database.</li>
+<li>Test registration, session revocation, login/recovery, account ownership, invalid input and administrative permissions.</li>
+<li>Exercise cart/checkout, simultaneous claims on the last item, duplicate submissions, cancellation/restocking, order transitions and COD reconciliation.</li>
+<li>Exercise overlapping notification workers, bounded retries, uncertain-delivery holds and dependency failures using test doubles/private services.</li>
+<li>Back up and restore synthetic SQL plus media, then separately rehearse a protected production backup restore under an approved data-access plan.</li>
+<li>Verify the production server configuration, Redis, Nginx and worker lifecycle in staging; then perform controlled live acceptance after deployment.</li>
+</ol>
+<p><strong>Execution boundary:</strong> the current AWS authorization is read-only. An isolated environment requires authorization for cloud/test-environment writes and an agreed cost limit if new resources are needed. The existing production host had only about 1.1 GiB free and should not be used for an unplanned full test installation or restore. No new AWS resources were created.</p>
+<p>Earlier local verification already covered 316 passing Linux backend checks (four MySQL-only skips), 30 focused MySQL regression checks, a corrected synthetic MySQL/uploads restore and a real Linux Gunicorn probe. Those results are documented in the main readiness report; they are not presented as AWS-hosted test-suite runs.</p>
+<h2>Evidence files</h2>
+<ul>
+<li><code>qa_artifacts/aws-backend-data-20261106.json</code>: sanitized observations from this live inspection.</li>
+<li><code>AURK_READINESS_REPORT.html</code>: deployment readiness and existing blockers.</li>
+<li><code>DEPLOYMENT.html</code>: reviewed release/migration/backup/rollback procedure.</li>
+<li><code>WEBSITE_DEPLOYMENT_PLAYBOOK.md</code>: reusable checklist for other projects.</li>
+</ul>
+</main></body></html>

@@ -1,0 +1,80 @@
+services:
+  web:
+    restart: unless-stopped
+    build: .
+    env_file: .env
+    environment:
+      FLASK_CONFIG: production
+      DATABASE_URL: ${DOCKER_DATABASE_URL:?Set DOCKER_DATABASE_URL in .env}
+      GUNICORN_BIND: 0.0.0.0:8000
+      UPLOAD_DIR: /app/instance/uploads
+      SESSION_COOKIE_SECURE: 'true'
+      TRUSTED_PROXY_COUNT: ${DOCKER_TRUSTED_PROXY_COUNT:-0}
+      RATELIMIT_STORAGE_URI: redis://redis:6379/0
+    command: ["gunicorn", "-c", "gunicorn.conf.py", "wsgi:app"]
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./instance/uploads:/app/instance/uploads
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/ready', timeout=3)"]
+      interval: 5s
+      timeout: 4s
+      retries: 20
+    ports:
+      - "127.0.0.1:8000:8000"
+  order-alerts:
+    build: .
+    env_file: .env
+    environment:
+      FLASK_CONFIG: production
+      SESSION_COOKIE_SECURE: 'true'
+      DATABASE_URL: ${DOCKER_DATABASE_URL:?Set DOCKER_DATABASE_URL in .env}
+      RATELIMIT_STORAGE_URI: redis://redis:6379/0
+    command: ["sh", "-ec", "while true; do python -m flask --app wsgi:app process-notifications; sleep 60; done"]
+    depends_on:
+      web:
+        condition: service_healthy
+    restart: unless-stopped
+  migrate:
+    profiles: ["maintenance"]
+    build: .
+    env_file: .env
+    environment:
+      FLASK_CONFIG: production
+      SESSION_COOKIE_SECURE: 'true'
+      DATABASE_URL: ${DOCKER_DATABASE_URL:?Set DOCKER_DATABASE_URL in .env}
+      RATELIMIT_STORAGE_URI: redis://redis:6379/0
+    command: ["python", "-m", "flask", "--app", "wsgi:app", "db", "upgrade"]
+    depends_on:
+      db:
+        condition: service_healthy
+  redis:
+    restart: unless-stopped
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  db:
+    restart: unless-stopped
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: ar_drips
+      MYSQL_USER: ar_drips_user
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD in .env}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in .env}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  mysql_data:

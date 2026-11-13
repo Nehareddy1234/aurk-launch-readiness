@@ -1,0 +1,355 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ seo.title }}{% endblock %}
+
+{% block content %}
+
+<section class="shop-page">
+
+    <!-- =====================================================
+         SHOP HEADER
+    ====================================================== -->
+
+    <div class="shop-header">
+
+        <div>
+            <h1>{{ selected_category.name if selected_category else 'Shop' }}</h1>
+
+            <p>
+                {{ selected_category.description if selected_category and selected_category.description else 'Discover the latest AURK collection.' }}
+            </p>
+        </div>
+
+
+        <!-- SEARCH -->
+
+        <form
+            class="shop-search"
+            method="get"
+            action="{{ url_for('products.shop') }}"
+        >
+
+            <input
+                type="search"
+                name="q"
+                value="{{ q }}"
+                placeholder="Search products..."
+                aria-label="Search products"
+            >
+
+            <button
+                class="button"
+                type="submit"
+            >
+                Search
+            </button>
+
+            {% if category_slug %}<input type="hidden" name="category" value="{{ category_slug }}">{% endif %}
+            <input type="hidden" name="sort" value="{{ request.args.get('sort', 'newest') }}">
+        </form>
+
+    </div>
+
+
+    <!-- =====================================================
+         CATEGORY FILTER
+    ====================================================== -->
+
+    {% if categories %}
+
+    <div class="category-filter">
+
+        <a
+            href="{{ url_for('products.shop', q=q, sort=request.args.get('sort', 'newest')) }}"
+            class="category-pill {{ 'active' if not category_slug else '' }}"
+        >
+            All
+        </a>
+
+        {% for category in categories %}
+
+        <a
+            href="{{ url_for(
+                'products.shop',
+                category=category.slug, q=q, sort=request.args.get('sort', 'newest')
+            ) }}"
+            class="category-pill {{ 'active' if category_slug == category.slug else '' }}"
+        >
+            {{ category.name }}
+        </a>
+
+        {% endfor %}
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- =====================================================
+         TOOLBAR
+    ====================================================== -->
+
+    <div class="shop-toolbar">
+
+        <span>
+            {{ pagination.total }} products
+        </span>
+
+
+        <form method="get">
+
+            {% if q %}
+
+                <input
+                    type="hidden"
+                    name="q"
+                    value="{{ q }}"
+                >
+
+            {% endif %}
+
+            {% if category_slug %}
+                <input type="hidden" name="category" value="{{ category_slug }}">
+            {% endif %}
+
+
+            <select
+                name="sort"
+                aria-label="Sort products"
+            >
+
+                <option
+                    value="newest"
+                    {% if request.args.get('sort', 'newest') == 'newest' %}
+                        selected
+                    {% endif %}
+                >
+                    Newest
+                </option>
+
+
+                <option
+                    value="featured"
+                    {% if request.args.get('sort') == 'featured' %}
+                        selected
+                    {% endif %}
+                >
+                    Featured
+                </option>
+
+
+                <option
+                    value="price_asc"
+                    {% if request.args.get('sort') == 'price_asc' %}
+                        selected
+                    {% endif %}
+                >
+                    Price: Low to High
+                </option>
+
+
+                <option
+                    value="price_desc"
+                    {% if request.args.get('sort') == 'price_desc' %}
+                        selected
+                    {% endif %}
+                >
+                    Price: High to Low
+                </option>
+
+            </select>
+            <button type="submit" class="button">Apply sort</button>
+
+        </form>
+
+    </div>
+
+
+    <!-- =====================================================
+         PRODUCT GRID
+    ====================================================== -->
+
+    <div class="product-grid">
+
+        {% for product in products %}
+
+        <article class="product-card" data-photo-gallery>
+
+
+            <!-- PRODUCT IMAGE -->
+
+            <a
+                class="product-card-image {{ 'availability-visual' if product.product_status != 'available' else '' }}"
+                href="{{ url_for(
+                    'products.detail',
+                    slug=product.slug
+                ) }}"
+            >
+
+                {% if product.primary_image %}
+
+                    <img
+                        src="{{ url_for(
+                            'products.product_image',
+                            image_id=product.primary_image.id
+                        ) }}"
+                        alt="{{ product.name }}"
+                        loading="lazy"
+                    >
+
+                {% else %}
+
+                    <div class="product-image-placeholder">
+                        No image
+                    </div>
+
+                {% endif %}
+
+
+                <!-- PRODUCT BADGE -->
+
+                {% if product.product_status != 'available' %}{% include 'shop/_availability_badge.html' %}
+                {% elif product.is_new_arrival %}
+
+                    <span class="product-badge">
+                        New
+                    </span>
+
+                {% elif product.is_bestseller %}
+
+                    <span class="product-badge">
+                        Bestseller
+                    </span>
+
+                {% endif %}
+
+            </a>
+
+
+            <div hidden data-card-photo-data>{% include 'shop/_photo_controls.html' %}</div>
+
+            <!-- PRODUCT INFORMATION -->
+
+            <div class="product-card-info">
+
+
+                {% if product.category %}
+
+                    <div class="product-category">
+                        {{ product.category.name }}
+                    </div>
+
+                {% endif %}
+
+
+                <h2>
+
+                    <a
+                        href="{{ url_for(
+                            'products.detail',
+                            slug=product.slug
+                        ) }}"
+                    >
+                        {{ product.name }}
+                    </a>
+
+                </h2>
+
+
+                <!-- PRICE -->
+
+                <div class="product-price">
+
+                    {% include 'shop/_card_price.html' %}
+
+                </div>
+
+                {% include 'shop/_quick_add.html' %}
+            </div>
+
+        </article>
+
+
+        {% else %}
+
+
+        <!-- NO PRODUCTS -->
+
+        <div class="empty-shop">
+
+            <h2>
+                No products found
+            </h2>
+
+            <p>
+                Try another search or browse all products.
+            </p>
+
+            <a
+                class="button"
+                href="{{ url_for('products.shop') }}"
+            >
+                View all products
+            </a>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+
+    <!-- =====================================================
+         PAGINATION
+    ====================================================== -->
+
+    {% if pagination.pages > 1 %}
+
+    <nav class="pagination">
+
+        {% if pagination.has_prev %}
+
+            <a
+                href="{{ url_for(
+                    'products.shop',
+                    page=pagination.prev_num,
+                    q=q,
+                    category=category_slug,
+                    sort=request.args.get('sort', 'newest')
+                ) }}"
+            >
+                ← Previous
+            </a>
+
+        {% endif %}
+
+
+        <span>
+            Page {{ pagination.page }}
+            of {{ pagination.pages }}
+        </span>
+
+
+        {% if pagination.has_next %}
+
+            <a
+                href="{{ url_for(
+                    'products.shop',
+                    page=pagination.next_num,
+                    q=q,
+                    category=category_slug,
+                    sort=request.args.get('sort', 'newest')
+                ) }}"
+            >
+                Next →
+            </a>
+
+        {% endif %}
+
+    </nav>
+
+    {% endif %}
+
+</section>
+
+{% endblock %}

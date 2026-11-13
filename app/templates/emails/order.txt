@@ -1,0 +1,40 @@
+AURK ? {{ headline }}
+{{ preheader }}
+
+Hi {{ order.shipping_name }},
+
+{{ introduction }}
+
+Order: {{ order.order_number }}
+Placed: {{ order.created_at.strftime('%d %b %Y') }}
+Payment method: Cash on delivery
+
+YOUR COLLECTION
+{% for item in order.items %}
+{{ item.product_name_snapshot }}
+{{ item.size_snapshot }} / {{ item.color_snapshot }} ? Qty {{ item.quantity }}
+Line total: {{ currency }} {{ '%.2f'|format(item.line_total) }}
+{% endfor %}
+Subtotal: {{ currency }} {{ '%.2f'|format(order.subtotal) }}
+{% if order.discount %}Discount: -{{ currency }} {{ '%.2f'|format(order.discount) }}
+{% endif %}Delivery: {{ 'Free' if not order.shipping else currency ~ ' ' ~ ('%.2f'|format(order.shipping)) }}
+{% if order.tax %}Tax: {{ currency }} {{ '%.2f'|format(order.tax) }}
+{% endif %}{{ "Order total (cancelled; nothing due)" if kind == "order_cancelled" else "Order total" if kind == "order_delivered" else "Pay on delivery" }}: {{ currency }} {{ '%.2f'|format(order.total) }}
+{% if kind == "order_cancelled" %}No payment is due for this cancelled order.{% else %}This email is an order update, not a payment receipt.{% endif %}
+
+DELIVERING TO
+{{ order.shipping_name }}
+{{ order.shipping_line1 }}
+{% if order.shipping_line2 %}{{ order.shipping_line2 }}
+{% endif %}{{ order.shipping_city }}, {{ order.shipping_state }} {{ order.shipping_postal_code }}
+{{ order.shipping_country }}
+{{ order.shipping_phone }}
+
+View your order: {{ order_url }}
+Sign in to the account you used at checkout to see your order.
+
+Questions or a detail to check? Reply to this email or contact {{ support_email }}.
+
+More than fits.
+Team AURK
+{{ website_url }}

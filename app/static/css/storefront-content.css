@@ -1,0 +1,23 @@
+.campaign-title{white-space:pre-line}
+.cover-video-track{position:absolute;inset:0;display:flex;transition:transform .65s ease}
+.storefront-theme .cover-video-track video{flex:0 0 100%;min-width:100%}
+@media(prefers-reduced-motion:reduce){.cover-video-track{transition:none}}
+.marketing-banners{position:relative;isolation:isolate;clear:both;width:100%;max-width:none;margin:clamp(24px,4vw,64px) 0 0;padding:0;background:#111;color:#fff}
+.banner-viewport{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain}
+.banner-viewport::-webkit-scrollbar{display:none}
+.banner-slide{flex:0 0 100%;min-width:0;scroll-snap-align:start;scroll-snap-stop:always}
+.marketing-banner{display:block;position:relative;color:inherit;text-decoration:none;aspect-ratio:3/1;width:100%}
+.marketing-banners .marketing-banner img{display:block;width:100%;height:100%;object-fit:contain}
+.marketing-banner h2{position:absolute;bottom:6%;left:5%;max-width:90%;margin:0;padding:8px 16px;background:#111c;color:#fff;font-size:clamp(16px,3vw,36px)}
+.banner-viewport:focus-visible{outline:2px solid #fff;outline-offset:-3px}
+.promotion-bar{display:flex;background:#111;color:#fff;align-items:center;min-height:42px;gap:12px;font-size:13px;letter-spacing:.06em}
+.promotion-window{overflow:hidden;flex:1;min-width:0}
+.promotion-track{display:flex;width:max-content;animation:promotion-scroll 30s linear infinite}
+.promotion-group{display:flex;align-items:center;flex-shrink:0;min-width:100vw;justify-content:space-around;gap:48px;padding:8px 24px;box-sizing:border-box}
+.promotion-group a{color:inherit;text-decoration:none;white-space:nowrap}
+.promotion-group a:focus-visible{outline:2px solid white;outline-offset:3px}
+.promotion-group span{margin-left:32px}
+.promotion-slow .promotion-track{animation-duration:45s}.promotion-fast .promotion-track{animation-duration:18s}
+.promotion-bar:hover .promotion-track,.promotion-bar:focus-within .promotion-track{animation-play-state:paused}
+@keyframes promotion-scroll{to{transform:translateX(-50%)}}
+@media(prefers-reduced-motion:reduce){.promotion-track{animation:none;width:auto}.promotion-group{min-width:0;width:100%;flex-wrap:wrap;gap:12px;justify-content:center}.promotion-group[aria-hidden]{display:none}.promotion-group a{white-space:normal}}

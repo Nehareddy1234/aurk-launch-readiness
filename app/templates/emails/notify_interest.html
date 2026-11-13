@@ -1,0 +1,14 @@
+{% extends 'emails/_base.html' %}
+{% block email_content %}
+<tr><td bgcolor="#000000" class="email-pad" style="padding:40px;color:#ffffff;">
+<p style="margin:0 0 24px;font-size:10px;letter-spacing:2px;font-weight:bold;">YOU'RE ON THE LIST</p>
+<p style="font-size:15px;line-height:1.8;">Hey {{ first_name }},</p>
+<p style="font-size:15px;line-height:1.8;">Thanks for showing interest in <strong>{{ product_name }}</strong>.</p>
+<p style="font-size:15px;line-height:1.8;">We've saved your request. We will update you when the drop is live.</p>
+<p style="font-size:13px;line-height:1.8;">This is a notification request, not an order or reservation.</p>
+<p style="margin:28px 0;"><a href="{{ product_url }}" style="display:inline-block;padding:16px 26px;border:1px solid #444444;background:#000000;color:#ffffff;text-decoration:none;font-size:13px;font-weight:bold;">View the drop &rarr;</a></p>
+<p style="font-size:14px;line-height:1.8;">Need a hand? Write to <a href="mailto:{{ support_email }}" style="color:#ffffff;">{{ support_email }}</a>.</p>
+<p style="font-size:14px;line-height:1.8;">Team AURK</p>
+</td></tr>
+{% endblock %}
+{% block delivery_note %}You received this email because you clicked Notify me for this AURK product. This is an automated message from an unmonitored address. For help, contact {{ support_email }}.{% endblock %}

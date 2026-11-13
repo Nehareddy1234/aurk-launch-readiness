@@ -1,0 +1,6 @@
+{% if storefront_content.bar_enabled and storefront_content.bar_messages %}
+<aside class="promotion-bar promotion-{{ storefront_content.bar_speed }}" aria-label="Store announcements">
+<div class="promotion-window"><div class="promotion-track">
+{% for copy in range(2) %}<div class="promotion-group" {% if copy %}aria-hidden="true"{% endif %}>{% for message in storefront_content.bar_messages.splitlines() if message.strip() %}<a href="{{ storefront_content.bar_link }}" {% if copy %}tabindex="-1"{% endif %}>{{ message }} <span aria-hidden="true">&bull;</span></a>{% endfor %}</div>{% endfor %}
+</div></div>
+</aside>{% endif %}

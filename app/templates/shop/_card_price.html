@@ -1,0 +1,6 @@
+{% if product.show_price %}
+<div class="price-display">
+{% if product.sale_price is not none and product.sale_price < product.base_price and product.storefront_price == product.current_price %}<del aria-label="Original price">&#8377;{{ '%.2f'|format(product.base_price) }}</del>{% endif %}
+<span class="sale-price">{{ 'From ' if product.storefront_price_varies else '' }}&#8377;{{ '%.2f'|format(product.storefront_price) }}</span>
+</div>
+{% endif %}

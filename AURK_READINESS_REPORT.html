@@ -1,0 +1,537 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>AURK deployment readiness report</title><style>body{margin:0;background:#f4f5f7;color:#17202b;font:16px/1.65 system-ui,-apple-system,Segoe UI,sans-serif}main{max-width:1100px;margin:32px auto;background:white;padding:40px 48px;border:1px solid #dde2e8;border-radius:12px}h1,h2,h3{line-height:1.2;color:#112840}h1{font-size:34px}h2{margin-top:2em;padding-top:.6em;border-top:1px solid #d9e1ea}h3{margin-top:1.6em}a{color:#075ca8}table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.5;margin:20px 0}th,td{padding:11px 12px;border:1px solid #d9e1ea;text-align:left;vertical-align:top;overflow-wrap:anywhere}th{background:#edf3f9}tr:nth-child(even){background:#fafbfd}pre{overflow:auto;padding:18px;background:#edf3f9;border-radius:6px}code{font-size:.9em}li{margin:.5em 0}.note{color:#536477;font-size:13px}@media(max-width:700px){main{margin:0;padding:24px 14px;border:0;border-radius:0}h1{font-size:27px}table{font-size:12px}td,th{padding:7px 5px}}@media print{body{background:white;font-size:10pt}main{max-width:none;margin:0;padding:0;border:0}h2{break-after:avoid}tr{break-inside:avoid}a{color:#17202b}pre{white-space:pre-wrap}}</style></head><body><main><p class="note">Updated 6 November 2026 · Offline report · Edit the companion Markdown file to reuse it. Print from your browser to save a PDF.</p><h1>AURK deployment readiness report</h1>
+<p>Assessment updated: 6 November 2026. Scope: prepare and test the local application, cover both supplied Instagram checklists, inspect the public website, and perform explicitly authorized read-only AWS/server diagnostics. No live files, services, resources, DNS or customer records were changed. The SSM session was terminated normally. Google account access and submission remain excluded. Business facts remain deferred by the owner.</p>
+<h2>Decision</h2>
+<p><strong>Prepared for a controlled staging/deployment rehearsal; not yet signed off for unrestricted commercial launch.</strong> Local fixes and the completed checks are listed below. The public server still runs an older release and has concrete infrastructure/recovery gaps. Confirmed business disclosures and operational evidence from the eventual live environment are still needed. These are explicit pending gates, not hidden behind a “100% ready” score.</p>
+<p>Use <code>WEBSITE_DEPLOYMENT_PLAYBOOK.md</code> as the reusable file for other projects. Use <code>DEPLOYMENT.md</code> for this application's upgrade, backup, verification and rollback procedure. Older recovered files named TESTING_REPORT, PRODUCTION_TEST_REPORT and similar are historical records; they are not evidence that this release has been deployed.</p>
+<h2>Current verification and deployment decision — 6 November</h2>
+<p><strong>NO-GO for signing off the commercial launch.</strong> The existing website responds publicly, but the new application is not deployed and the infrastructure/operations gates below remain open. Most remaining actions are host configuration, recovery rehearsal, business facts and real provider acceptance—not missing frontend pages.</p>
+<h3>Completed local changes in this follow-up</h3>
+<ul>
+<li>Reject unknown environment names and unsafe production secret/cookie/CSRF settings. Production WSGI remains explicit; Compose uses consistent production/secure-cookie settings for every app process.</li>
+<li>Readiness checks the required database revision, shared Redis when configured and persistent upload permissions. Configuration preflight also flags active QA products and less than 2 GiB free disk space.</li>
+<li>Added migration <code>d4ab72cd5610</code> for bounded product-interest alert retries, backoff and uncertain-delivery holds. Added a reviewed single-alert retry command and read-only queue-age/failure checks.</li>
+<li>Reduced default database pool and Gunicorn worker counts for the observed small host; added worker recycling and graceful shutdown settings. This is a conservative starting configuration, not a capacity guarantee.</li>
+<li>Removed migration-on-web-start behavior in Compose. Migrations are a separate maintenance command. Repaired invalid CI YAML, constrained test dependencies to the release lock, and added Python 3.11/3.14 CI coverage configuration.</li>
+<li>Removed request URLs from supplied Gunicorn/Nginx access formats to reduce reset-token leakage.</li>
+<li>Hardened backup archives against path traversal, links, unexpected entries, tampering and insufficient restore space. Backup maintenance preserves the prior service/timer state and refuses an active legacy scheduler. Verified SQL/uploads recovery using disposable data. This does not certify the production backup process.</li>
+</ul>
+<h3>New evidence</h3>
+<table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Observed result</th>
+<th>Evidence / limitation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Full Linux backend, Python 3.14.4</td>
+<td><strong>316 passed, 4 skipped</strong></td>
+<td><code>qa_artifacts/deployment-linux314-20261106.xml</code>; matches live Python exactly. Four tests require MySQL; four SQLAlchemy deprecation warnings.</td>
+</tr>
+<tr>
+<td>Full Linux backend, Python 3.12.3</td>
+<td><strong>305 passed, 4 skipped</strong></td>
+<td><code>qa_artifacts/deployment-linux-20261106.xml</code>; earlier run before 11 additional backup archive tests.</td>
+</tr>
+<tr>
+<td>Final retry/preflight/archive regressions</td>
+<td><strong>23 passed, 1 skipped</strong></td>
+<td><code>qa_artifacts/operations-final-20261106.xml</code>; includes the final reviewed retry and QA-catalogue gate changes.</td>
+</tr>
+<tr>
+<td>Dedicated MySQL 8.4.13 regression and synthetic restore</td>
+<td><strong>30 regression checks passed; 1 restore check passed after fixture correction</strong></td>
+<td><code>qa_artifacts/deployment-mysql-focused-20261106.xml</code> records 30 passes and an initial existing-directory error in the new restore fixture. The corrected recovery test passed in <code>qa_artifacts/backup-mysql-20261106.xml</code>, verifying synthetic SQL records and upload content. The attempted full MySQL suite exceeded its 20-minute limit and is not a pass.</td>
+</tr>
+<tr>
+<td>Real Linux Gunicorn on Python 3.14.4</td>
+<td><strong>Passed</strong></td>
+<td><code>qa_artifacts/linux-gunicorn-python314-20261106.json</code>; 40 public requests, concurrency 8, zero failures, p95 about 227 ms; graceful shutdown exit 0. Isolated SQLite/memory limiter, not production capacity or real Redis validation.</td>
+</tr>
+<tr>
+<td>Backup archive regressions</td>
+<td><strong>11 passed</strong></td>
+<td>Included in the 316-test suite and final regression set; safe round trip, corrupted checksum and malformed/archive-link cases. Do not add these as unique tests again.</td>
+</tr>
+<tr>
+<td>Existing public routes/assets</td>
+<td><strong>46/46 passed</strong></td>
+<td><code>qa_artifacts/public-smoke-20261106.json</code>; legacy storefront/admin redirect/media-range checks, not a checkout/order mutation.</td>
+</tr>
+<tr>
+<td>Supplementary live deployment checks</td>
+<td><strong>Failed / partial</strong></td>
+<td><code>qa_artifacts/public-readiness-20261106.json</code>: four new routes still 404, canonical-host gap; public TLS/cookie checks passed.</td>
+</tr>
+<tr>
+<td>AWS/server inventory</td>
+<td><strong>Read-only completed</strong></td>
+<td><code>qa_artifacts/aws-readonly-20261106.json</code>; findings below. No deployment or resource change.</td>
+</tr>
+<tr>
+<td>Docker/CI/systemd/Nginx deployment</td>
+<td><strong>Pending execution</strong></td>
+<td>Compose and workflow YAML parsed; CI not pushed/run, Docker image not built and service templates not installed.</td>
+</tr>
+</tbody>
+</table>
+<p>No real customer email/order/courier request was sent. Local tests block external SMTP/network effects. Counts overlap between runtimes and focused suites. A dependency advisory scan of the unchanged runtime lock on 5 November reported no known vulnerabilities; that is a point-in-time result, not security certification.</p>
+<h3>Actual live findings and required action</h3>
+<table>
+<thead>
+<tr>
+<th>Priority</th>
+<th>Verified observation</th>
+<th>Required action before sign-off</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Deployment / capacity</td>
+<td>Root EBS is 8 GiB; filesystem 84% used with about 1.1 GiB free. Host is t3.small, about 2 GiB RAM, no swap.</td>
+<td>Plan more disk capacity and free-space alerts before installing another release/backup. The release preflight requires 2 GiB free. Review a larger volume, e.g. 20 GiB, against growth and cost; no resize performed.</td>
+</tr>
+<tr>
+<td>Recovery</td>
+<td>No snapshots observed in ap-south-2; the one listed S3 bucket contained four old deployment artifacts, with no SQL/uploads backups visible.</td>
+<td>Create a consistent private off-server store backup, verify the download/checksum and restore it in isolation. Define retention, recovery time/data-loss targets and failure alerts. This inspection cannot rule out backups in an unexamined external system.</td>
+</tr>
+<tr>
+<td>Data protection</td>
+<td>Existing root EBS is unencrypted, delete-on-termination is enabled, instance termination protection is off.</td>
+<td>Plan encrypted replacement/storage migration from a verified backup and review deletion/termination protection. Enabling encryption-by-default alone does not encrypt an existing volume.</td>
+</tr>
+<tr>
+<td>Stable URL</td>
+<td>Public IP is auto-assigned; no Elastic IP attached.</td>
+<td>Choose stable addressing or a suitable frontend; coordinate DNS if allocating/associating an Elastic IP. Do not casually stop/start the instance while DNS depends on its current address.</td>
+</tr>
+<tr>
+<td>Undeployed release</td>
+<td>Live schema is <code>a1de49fa2387</code>; live Pillow is 12.3.0 while the reviewed lock has 13.0.0. Authlib is absent.</td>
+<td>Rehearse and install the complete locked release; upgrade through b2, c3 and d4 after backup. OAuth can remain disabled. Never stamp or fresh-start the production database.</td>
+</tr>
+<tr>
+<td>Shared limiter / proxy</td>
+<td>Redis service inactive; no shared rate-limit URL or trusted-proxy count found in inspected settings. WSGI explicitly uses production.</td>
+<td>Install/configure private Redis and the verified single proxy count, then exercise readiness and rate limits with the real services. An unset FLASK_CONFIG did not mean the live app was in debug mode.</td>
+</tr>
+<tr>
+<td>New routes / canonical host</td>
+<td><code>/api/ready</code>, <code>/robots.txt</code>, <code>/sitemap.xml</code> and <code>/merchant-feed.xml</code> returned 404; HTTPS www remained www.</td>
+<td>Deploy reviewed app/static/Nginx configuration; verify readiness, chosen-host redirect and public indexing settings after owner approval. No Google account is needed for these public checks.</td>
+</tr>
+<tr>
+<td>Workers / alerts</td>
+<td>Only aurk, the legacy customer-email service and its timer were installed. New notification/backup/health units were absent. No EC2 alarms were listed.</td>
+<td>Carefully hand over from <code>aurk-customer-emails.timer</code> to the new worker, install reviewed backup/health jobs and configure a human alert destination. Prove a test failure reaches the owner. Other monitoring was not comprehensively audited.</td>
+</tr>
+<tr>
+<td>Catalogue</td>
+<td>Five active QA-marked products were found by aggregate query; a QA product was publicly reachable.</td>
+<td>Owner reviews and archives appropriate QA listings without deleting order history. New preflight blocks sign-off while active QA markers remain. No live product was altered.</td>
+</tr>
+<tr>
+<td>Email</td>
+<td>SMTP configuration present; queues showed 9 customer and 4 owner messages submitted. MX points to Hostinger; SPF includes Hostinger; DMARC is monitoring (<code>p=none</code>).</td>
+<td>Confirm actual sender/DKIM alignment and controlled recovery/receipt/owner-alert inbox arrival. SMTP acceptance is not delivery. No conclusion of SPF failure is justified from this record alone.</td>
+</tr>
+<tr>
+<td>Business / fulfilment</td>
+<td>Legal name/address/returns/grievance/GST facts and DTDC PIN list remain owner-deferred.</td>
+<td>Supply confirmed facts and approve billing/returns promises; validate PIN coverage manually per order or load a confirmed allowlist. Do not invent disclosures.</td>
+</tr>
+<tr>
+<td>Final acceptance</td>
+<td>No real device/courier/full live COD acceptance or production restoration drill completed.</td>
+<td>Owner-controlled end-to-end acceptance with approved test data, inbox and fulfilment process.</td>
+</tr>
+</tbody>
+</table>
+<p>Positive live observations: instance running with 3/3 status checks; IMDSv2 required; app/Nginx/MySQL active; security group exposes HTTP/HTTPS publicly with no public database/Redis rule, and SSH is restricted to two /32 rules plus a prefix list (prefix-list identity not independently audited). S3 public access blocking is on and default encryption is SSE-S3, but versioning is off. TLS 1.3 certificate covers aurk.in/www and expires 11 January 2027; certbot renewal timer exists and its last observed service result was successful. Secure/HttpOnly/SameSite cookies and HSTS were observed. A successful prior renewal result is not a fresh renewal dry-run.</p>
+<p>AWS documents that <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/working-with-eips.html">Elastic IPs are static and chargeable</a> and <a href="https://docs.aws.amazon.com/ebs/latest/userguide/encryption-by-default.html">encryption-by-default affects new volumes/copies, not existing volumes</a>. Review the concrete addressing/storage plan and costs before any AWS writes.</p>
+<h3>Recommended execution order</h3>
+<ol>
+<li>Confirm backup destination/access and recovery owner; take and restore a consistent store backup.</li>
+<li>Approve the capacity, encrypted-storage and stable-address plan; protect the instance and verify DNS/HTTPS after any network change.</li>
+<li>Rehearse the locked release and migrations against the restored copy, including private Redis and runtime readiness.</li>
+<li>Deploy during a controlled write pause; preserve <code>.env</code>, uploads and prior release; hand over the old notification timer once.</li>
+<li>Verify public routes, canonical host, catalogue, queue/backup/uptime alerts and controlled email arrival.</li>
+<li>Complete owner disclosures, fulfilment and supported-device acceptance, then sign off commercial launch. Google work stays separate.</li>
+</ol>
+<h2>Changes prepared in the application</h2>
+<ul>
+<li>Reconciled the newer storefront/account/admin functionality with the existing login, security and checkout fixes. Preserved a recovery archive and avoided the destructive historical fresh-start workflow.</li>
+<li>Added safe public metadata, canonical origins, product variant structured data, crawl controls, sitemaps and a product feed. Private/search-result pages receive appropriate indexing exclusions. Added distinct descriptions for public information pages and preserved selected variants from product-feed links.</li>
+<li>Added an admin business/delivery settings screen without fabricating unknown legal/address/GST details. Added manual or PIN-list COD coverage handling, required verification before confirmation, tracking/AWB checks and shipment/return status controls.</li>
+<li>Added COD remittance records, partial settlement handling and safeguards against duplicate or excessive reconciliation. Updated customer-facing policy/receipt wording for the actual workflow.</li>
+<li>Strengthened authentication/session behavior and retained server-side stock/price checks. Added regression coverage for protected routes, uploads, account ownership, checkout and recovery.</li>
+<li>Reconciled migrations, added guards against the historical conflicting revision chain, and verified clean MySQL upgrades. Fixed MySQL UTC session handling and concurrent launch-notification queueing.</li>
+<li>Prepared customer/owner notification processing, stock rechecks and retry controls; added readiness/configuration checks, service/timer templates and backup/restore utilities.</li>
+<li>Improved the custom 404, dynamic copyright year, form busy/confirmation behavior and homepage video pause control. Verified public-page reflow and menu navigation at 320, 390, 768 and 1440 CSS pixels.</li>
+<li>Upgraded Pillow to 13.0.0 following the dependency advisory scan and restricted the remaining generic image decoder to JPEG/PNG/WebP. Updated static asset version URLs so browsers fetch the changed scripts/styles. The upstream version is documented in <a href="https://pillow.readthedocs.io/en/stable/releasenotes/13.0.0.html">Pillow's release notes</a>.</li>
+<li>Prepared a source-only release builder with a file manifest and SHA-256 checksum; real environment files, databases, customer uploads, local QA tools and recovery archives are excluded.</li>
+</ul>
+<h2>Prior verification — 5 November (retained evidence)</h2>
+<table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Result</th>
+<th>Evidence and limits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Unit, integration and security suite</td>
+<td>294 passed; 3 skipped</td>
+<td><code>qa_artifacts/launch-local.xml</code>; three skipped tests require MySQL row locking. Four existing SQLAlchemy Query.get deprecation warnings are non-failing maintenance items.</td>
+</tr>
+<tr>
+<td>Dedicated local MySQL 8.4.13 suite</td>
+<td>17 passed</td>
+<td><code>qa_artifacts/launch-mysql.xml</code>; migrations/schema, checkout concurrency, notification locking, UTC and launch deduplication. Synthetic isolated database; no production data.</td>
+</tr>
+<tr>
+<td>Chromium application/browser suite</td>
+<td>17 passed</td>
+<td><code>qa_artifacts/launch-browser.xml</code>; storefront/account/admin journeys, checkout, media, metadata, layout, mobile menu and automated accessibility checks.</td>
+</tr>
+<tr>
+<td>Final homepage/accessibility regression</td>
+<td>5 passed</td>
+<td><code>qa_artifacts/launch-visual.xml</code>; four viewport screenshots, pause controls, readable content layering and automated accessibility rechecked after the final CSS/JS fix.</td>
+</tr>
+<tr>
+<td>Local HTTPS recovery scenario</td>
+<td>1 passed</td>
+<td><code>qa_artifacts/launch-https.xml</code>; local TLS/password recovery test, not the public domain certificate.</td>
+</tr>
+<tr>
+<td>Dependency advisory scan of release lock</td>
+<td>No known vulnerabilities reported</td>
+<td><code>qa_artifacts/dependency-audit.json</code>, after Pillow upgrade; this is an advisory snapshot, not a guarantee of security.</td>
+</tr>
+<tr>
+<td>Historical release archive integrity</td>
+<td>Passed on 5 November</td>
+<td>The 218-file package was superseded by the rebuilt 6 November release; use the current SHA-256 sidecar.</td>
+</tr>
+<tr>
+<td>Dependency consistency</td>
+<td>Passed</td>
+<td><code>python -m pip check</code>: no broken requirements.</td>
+</tr>
+<tr>
+<td>Production host / Linux services / Docker</td>
+<td>Not executed in the 5 November scope</td>
+<td>See the newer 6 November inspection and Linux runtime results above. Actual Docker/service installation remains pending.</td>
+</tr>
+<tr>
+<td>Real SMTP, courier and production restore</td>
+<td>Not certified</td>
+<td>No real customer messages, courier actions or production restore. Public HTTPS was checked on 6 November, as reported above.</td>
+</tr>
+</tbody>
+</table>
+<p>Do not add these counts as unique tests: the dedicated MySQL suite reruns selected integration scenarios. Tests block external SMTP/network effects and use disposable data. Automated accessibility checks did not report serious/critical violations in the tested routes; they do not establish full WCAG compliance or replace keyboard, screen-reader and real-device testing.</p>
+<h2>Every item from the first Instagram post</h2>
+<p>Source: <a href="https://www.instagram.com/p/DcKiRe3TvdB/">@yatesvids checklist</a>. Item labels below are paraphrased. PASS means the stated local check, not a claim about the current public server.</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Item</th>
+<th>AURK result / evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Sideways page movement</td>
+<td>PASS: tested routes fit 320/390/768/1440 viewports.</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Dead destinations</td>
+<td>PASS locally: critical journey links and public/footer destinations resolve; external inbox/courier services need live verification.</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Small-screen navigation</td>
+<td>PASS: menu opens and navigates to Contact in browser checks.</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Browser icon</td>
+<td>PRESENT: local site icon configured.</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Meaningful document headings</td>
+<td>PASS: page titles present; public information/product pages have descriptive titles.</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Search summaries</td>
+<td>FIXED: distinct public page descriptions plus product/category metadata.</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Bottom navigation</td>
+<td>PASS: footer destinations checked locally.</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Missing-page recovery</td>
+<td>FIXED: custom 404 with shop/home actions and correct status.</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Current footer date</td>
+<td>FIXED: copyright year comes from the current UTC year.</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Image weight</td>
+<td>IMPLEMENTED: WebP generation, bounded dimensions and deferred product images. Actual network performance remains a live/device measurement.</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Working controls</td>
+<td>PASS for covered customer/admin actions; no blanket certification of every possible state.</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Completed-action feedback</td>
+<td>PRESENT/IMPROVED: order/account/interest confirmations and form submission feedback.</td>
+</tr>
+<tr>
+<td>13</td>
+<td>Failed-action feedback</td>
+<td>PASS in covered invalid-input, auth and commerce cases; errors do not expose server tracebacks.</td>
+</tr>
+<tr>
+<td>14</td>
+<td>Real content</td>
+<td>Local customer pages reviewed; final legal identity/address details remain intentionally blank pending owner input. Production catalogue still needs owner approval.</td>
+</tr>
+<tr>
+<td>15</td>
+<td>Useful navigation only</td>
+<td>PASS: no empty/hash-only anchors in the tested pages; deliberate section links retained.</td>
+</tr>
+<tr>
+<td>16</td>
+<td>Mobile clipping</td>
+<td>PASS: public route reflow assertions at four widths.</td>
+</tr>
+<tr>
+<td>17</td>
+<td>Brand link behavior</td>
+<td>PRESENT: header/footer branding links home.</td>
+</tr>
+<tr>
+<td>18</td>
+<td>Tap-to-call</td>
+<td>PRESENT: Contact has a <code>tel:</code> link. Actual phone availability is an operational check.</td>
+</tr>
+<tr>
+<td>19</td>
+<td>Email action</td>
+<td>PRESENT: <code>mailto:support@aurk.in</code>; actual inbox delivery remains unverified.</td>
+</tr>
+<tr>
+<td>20</td>
+<td>Phone usability</td>
+<td>PASS for Chromium emulation and tested journeys; real iOS/Safari/Android checks remain pending.</td>
+</tr>
+</tbody>
+</table>
+<h2>Every item from the second Instagram post</h2>
+<p>Source: <a href="https://www.instagram.com/p/DfShMOkPXQW/">@techfindsa checklist</a>. Optional marketing/product choices are distinguished from launch gates.</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Item</th>
+<th>AURK result / requirement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Branded error destination</td>
+<td>PASS: custom 404 and useful recovery links.</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Early primary action</td>
+<td>PASS: homepage CTA fits within the tested 900-pixel viewport height at all four widths.</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Individual page metadata</td>
+<td>IMPLEMENTED: public titles/canonicals and product overrides. Private auth/account pages are excluded from search.</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Description snippets</td>
+<td>FIXED for public information pages; product/category descriptions generated or editable.</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Link-preview artwork</td>
+<td>IMPLEMENTED: Open Graph/Twitter metadata with branded fallback and product images. Public crawler fetch/preview remains a later check.</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Tab icon</td>
+<td>PRESENT.</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Crawler rules</td>
+<td>IMPLEMENTED: <code>robots.txt</code> with staging/public behavior. Account access was not required.</td>
+</tr>
+<tr>
+<td>8</td>
+<td>URL inventory</td>
+<td>IMPLEMENTED: sitemap index and page/product sitemaps. Submission excluded.</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Image alternatives</td>
+<td>PASS: no images missing an alt attribute in tested public pages; decorative controls appropriately use empty alternatives. Human quality review remains useful.</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Adaptive widths</td>
+<td>PASS at 320/390/768/1440 CSS pixels.</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Persistent phone CTA</td>
+<td>OPTIONAL: no blanket requirement to add one; current reachable product/cart controls remain.</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Waiting feedback</td>
+<td>IMPROVED: submit-once busy states and duplicate-submit protection on applicable forms.</td>
+</tr>
+<tr>
+<td>13</td>
+<td>Validation feedback</td>
+<td>PASS for tested form and server validation.</td>
+</tr>
+<tr>
+<td>14</td>
+<td>Completion destination</td>
+<td>PRESENT: existing order receipt/account confirmation serves the purpose. An extra generic thank-you route is unnecessary.</td>
+</tr>
+<tr>
+<td>15</td>
+<td>Privacy explanation</td>
+<td>PRESENT/UPDATED: describes account, order, essential session, provider and photo behavior; factual business completion remains pending.</td>
+</tr>
+<tr>
+<td>16</td>
+<td>Terms</td>
+<td>PRESENT/UPDATED: owner must confirm actual fulfilment and business details. Presence alone is not legal approval.</td>
+</tr>
+<tr>
+<td>17</td>
+<td>Consent banner</td>
+<td>CONDITIONAL: no new analytics/advertising added. Review actual production embeds/cookies and applicable rules before deciding on consent UI.</td>
+</tr>
+<tr>
+<td>18</td>
+<td>Visitor measurement</td>
+<td>OPTIONAL: no analytics account or tracker installed. It is not required to accept visitors/orders.</td>
+</tr>
+<tr>
+<td>19</td>
+<td>Genuine contact/address</td>
+<td>PARTIAL: phone/email shown; legal/business/return address and grievance details await owner facts. This remains a business launch gate.</td>
+</tr>
+<tr>
+<td>20</td>
+<td>Promoted repository/service connection</td>
+<td>OPTIONAL: no third-party promotional service connected. A reviewed versioned release and suitable monitoring matter; the named service does not.</td>
+</tr>
+</tbody>
+</table>
+<h2>Remaining gates and who supplies the evidence</h2>
+<table>
+<thead>
+<tr>
+<th>Priority</th>
+<th>Pending item</th>
+<th>Owner / next action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Business launch gate</td>
+<td>Legal name, business/return address and grievance contact</td>
+<td>Owner supplies confirmed details later; enter Admin &gt; Business &amp; delivery. Do not reuse someone else's identity/address.</td>
+</tr>
+<tr>
+<td>Business launch gate</td>
+<td>Tax status and billing accuracy</td>
+<td>Owner confirms GST registration/applicability and actual invoice requirements. The application does not fabricate GSTIN or claim a non-GST bill is a GST invoice.</td>
+</tr>
+<tr>
+<td>Fulfilment gate</td>
+<td>DTDC COD serviceability and operating process</td>
+<td>Obtain supported PINs or use the implemented per-order manual coverage verification. Verify coverage before confirming/dispatching each order. Courier API automation is not required for this manual model.</td>
+</tr>
+<tr>
+<td>Communications gate</td>
+<td>Real mailbox, sender authentication and delivery</td>
+<td>Verify support inbox, transactional sender/domain settings, controlled receipt/recovery/status emails and owner alert delivery. Local mocks cannot prove inbox arrival.</td>
+</tr>
+<tr>
+<td>Deployment gate, writes pending</td>
+<td>Production configuration, schema, durable storage and protected infrastructure</td>
+<td>Follow DEPLOYMENT.md and the verified 6 November findings above. AWS inspection is complete; deployment/resource changes require a separately authorized execution step.</td>
+</tr>
+<tr>
+<td>Recovery gate</td>
+<td>Private off-server backup and successful restore</td>
+<td>Configure actual destination/access, retention and failure alerts; restore a recent bundle in isolation and record recovery evidence. Templates alone do not satisfy this gate.</td>
+</tr>
+<tr>
+<td>Operations gate</td>
+<td>Human outage/queue/backup alerts</td>
+<td>Choose an alert recipient/provider and prove a test failure reaches them. The health timer currently provides a check, not a complete alerting system.</td>
+</tr>
+<tr>
+<td>Acceptance gate</td>
+<td>Real-device and owner purchase/fulfilment review</td>
+<td>Check supported devices, slow network, approved catalogue, delivery/refund promises and a controlled complete COD lifecycle.</td>
+</tr>
+<tr>
+<td>Separate optional integration</td>
+<td>Google sign-in, search/merchant submission</td>
+<td>Explicitly deferred. Leave optional OAuth settings blank until separately configured; password/phone login can be used.</td>
+</tr>
+</tbody>
+</table>
+<p>Applicable business disclosures require owner confirmation. For the India-facing store, review the official <a href="https://consumeraffairs.gov.in/public/upload/files/E%20commerce%20rules_1732703966.pdf">Consumer Protection (E-Commerce) Rules</a> against the actual business model. A cookie banner is not an automatic substitute for a data/technology inventory; see the conditional treatment in the reusable playbook.</p>
+<h2>Operational limits worth retaining in the handover</h2>
+<p>SMTP is not an exactly-once delivery mechanism; acceptance can be uncertain after a connection or process failure. Inspect provider/inbox evidence before manual resend. Product-interest owner alerts now stop automatic retry after five failures or an uncertain delivery. Fix the provider, review the individual alert and use the documented reviewed retry command; never bulk-reset uncertain outcomes. Notification and backup timers must not duplicate older schedulers.</p>
+<p>The default backup procedure briefly stops the app to keep SQL and uploads consistent. Retention cleanup and an external alert destination still need operational configuration. The restore script accepts trusted SQL only and should run in isolation. Local migration tests are not a production restoration drill.</p>
+<p>The background video now has a pause control and honors reduced motion. Remaining visual polish, comprehensive assistive-technology review and real performance measurements can reveal further improvements; no accessibility, security or legal certification is claimed.</p>
+<h2>Deliverables</h2>
+<ul>
+<li><code>WEBSITE_DEPLOYMENT_PLAYBOOK.md</code>: reusable requirements, status/owner/evidence template, launch sequence and cost worksheet.</li>
+<li><code>AURK_READINESS_REPORT.md</code>: this assessment, every post item, evidence and remaining gates.</li>
+<li><code>DEPLOYMENT.md</code>: AURK-specific staging, configuration, release, backup/restore and rollback procedure.</li>
+<li><code>dist/aurk-release.zip</code> and <code>dist/aurk-release.sha256</code>: prepared source release, with <code>release-manifest.json</code> inside.</li>
+<li><code>qa_artifacts/</code>: local test/advisory evidence; deliberately not included in the deployment archive.</li>
+</ul>
+<p>The report separates “code prepared,” “locally tested,” “owner information required,” and “production verification pending” so that a future release decision can be made from evidence rather than the appearance of the website.</p>
+</main></body></html>

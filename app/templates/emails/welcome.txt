@@ -1,0 +1,28 @@
+AURK ? Welcome to the community
+
+Hey {{ first_name }},
+
+Welcome to AURK. Your account is ready, and your next favourite fit is waiting to be found.
+Explore the collection, find what feels like you, and wear it your way.
+
+FIND YOUR FIT
+Discover the collection and choose your size and colour.
+
+KEEP IT ALL TOGETHER
+Save delivery details and follow your orders from your account.
+
+MAKE IT YOURS
+After your order is delivered, share your style on Worn by you.
+
+Explore the collection: {{ shop_url }}
+Open my account: {{ account_url }}
+Sign in with the email and password you used to register.
+
+Need a hand? Write to {{ support_email }}.
+
+More than fits.
+Team AURK
+{{ website_url }}
+
+You received this email because you created an AURK account.
+This is an automated message from an unmonitored address. For help, contact {{ support_email }}.

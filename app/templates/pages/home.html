@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}AURK &mdash; More than fits{% endblock %}
+{% block page_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/home-header.css', v='20261029') }}">
+{% endblock %}
+{% block body_class %}home-page{% endblock %}
+{% block content %}
+{% set campaign = storefront_content %}
+{% if campaign.cover_enabled %}<section class="aurk-campaign" aria-label="Indian streetwear">
+<div class="aurk-campaign-image">
+<div class="cover-video-track" data-cover-playlist>
+<video autoplay {% if not campaign.second_desktop_video %}loop{% endif %} muted playsinline preload="metadata" disablepictureinpicture aria-hidden="true" poster="{{ url_for('main.storefront_media', key=campaign.poster) if campaign.poster else url_for('static', filename='images/brand/hero.webp') }}">
+<source src="{{ url_for('main.storefront_media', key=campaign.mobile_video) if campaign.mobile_video else (url_for('main.storefront_media', key=campaign.desktop_video) if campaign.desktop_video else url_for('static', filename='videos/store-cover-mobile.mp4')) }}" media="(max-width: 760px)" type="video/mp4">
+<source src="{{ url_for('main.storefront_media', key=campaign.desktop_video) if campaign.desktop_video else url_for('static', filename='videos/store-cover.mp4') }}" type="video/mp4">
+</video>
+{% if campaign.second_desktop_video %}<video muted playsinline preload="metadata" disablepictureinpicture aria-hidden="true">
+<source src="{{ url_for('main.storefront_media', key=campaign.second_mobile_video or campaign.second_desktop_video) }}" media="(max-width: 760px)" type="video/mp4">
+<source src="{{ url_for('main.storefront_media', key=campaign.second_desktop_video) }}" type="video/mp4">
+</video>{% endif %}
+</div>
+</div>
+<div class="aurk-campaign-shade"></div>
+<div class="aurk-campaign-copy"><h1 class="campaign-title">{{ campaign.cover_title }}</h1><p>{{ campaign.cover_subtitle }}</p>{% if campaign.cover_button %}<a class="button" href="{{ campaign.cover_link }}">{{ campaign.cover_button }} <span aria-hidden="true">&rarr;</span></a>{% endif %}</div>
+<div class="aurk-campaign-side" aria-hidden="true">PEOPLE<br>PLACES<br>STORIES<br>BEYOND</div>
+<button class="cover-pause" type="button" data-cover-toggle aria-pressed="false" hidden>Pause background video</button>
+<div class="aurk-campaign-bottom"><span>STREETWEAR / INDIAN</span><span>EST. 2026</span></div>
+</section>{% endif %}
+{% set banners = campaign.banners|selectattr('enabled')|selectattr('image')|list %}
+{% if banners %}<section class="marketing-banners" aria-label="Store promotions" aria-roledescription="carousel" data-banner-carousel>
+<div class="banner-viewport" id="banner-viewport" tabindex="0" aria-label="Promotional banners. Swipe or use left and right arrow keys.">
+{% for banner in banners %}<div class="banner-slide" role="group" aria-roledescription="slide" aria-label="{{ loop.index }} of {{ banners|length }}"><a class="marketing-banner" href="{{ banner.link }}"><img src="{{ url_for('main.storefront_media', key=banner.image) }}" alt="{{ banner.alt }}" loading="{{ 'eager' if loop.first else 'lazy' }}">{% if banner.title %}<h2>{{ banner.title }}</h2>{% endif %}</a></div>{% endfor %}
+</div>
+
+</section>{% endif %}
+<section id="collections" class="container storefront-section"><div class="storefront-section-heading"><div><p class="eyebrow">FIND YOUR FIT</p><h2>Your style starts here.</h2></div><a href="{{ url_for('products.shop') }}">Shop everything &rarr;</a></div><div class="home-collections">{% for category in categories %}<a href="{{ url_for('products.shop', category=category.slug) }}"><h3>{{ category.name }}</h3><span aria-hidden="true">&nearr;</span></a>{% else %}<a href="{{ url_for('products.shop') }}"><h3>All styles</h3><span aria-hidden="true">&nearr;</span></a>{% endfor %}</div></section>
+{% if featured %}<section class="container storefront-section"><div class="storefront-section-heading"><div><h2>Make your next move.</h2></div><a href="{{ url_for('products.shop') }}">View all &rarr;</a></div><div class="home-product-grid">{% for product in featured %}{% include 'shop/_home_card.html' %}{% endfor %}</div></section>{% endif %}
+{% if new_arrivals %}<section class="container storefront-section"><div class="storefront-section-heading"><div><p class="eyebrow">JUST LANDED</p><h2>Fresh fits. New energy.</h2></div><a href="{{ url_for('products.shop', sort='newest') }}">Explore the latest &rarr;</a></div><div class="home-product-grid">{% for product in new_arrivals %}{% include 'shop/_home_card.html' %}{% endfor %}</div></section>{% endif %}
+{% if bestsellers %}<section class="container storefront-section"><div class="storefront-section-heading"><div><p class="eyebrow">THE BESTSELLER EDIT</p><h2>Bring the street to your rotation.</h2></div></div><div class="home-product-grid">{% for product in bestsellers %}{% include 'shop/_home_card.html' %}{% endfor %}</div></section>{% endif %}
+{% endblock %}

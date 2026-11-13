@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}{{ seo.title }}{% endblock %}
+{% block content %}
+<section class="container commerce-page product-shopping-page">
+<a class="subtle-link" href="{{ url_for('products.shop') }}">&larr; Back to shop</a>
+<div class="shopping-product-layout">
+  <div class="shopping-gallery" data-photo-gallery>
+    <div class="shopping-main-image {{ 'availability-visual' if product.product_status != 'available' else '' }}">{% if product.primary_image %}<a class="shopping-image-link" id="fullProductImage" href="{{ url_for('products.product_image', image_id=product.primary_image.id) }}" target="_blank" rel="noopener" aria-label="Open selected product photo at full size in a new tab"><img id="mainProductImage" src="{{ url_for('products.product_image', image_id=product.primary_image.id) }}" alt="{{ product.name }}"></a>{% else %}<div class="shopping-image-empty">AURK<span>Image coming soon</span></div>{% endif %}{% if product.product_status != 'available' %}{% include 'shop/_availability_badge.html' %}{% endif %}</div>
+    {% include 'shop/_photo_controls.html' %}
+    {% for media in product.images if media.mime_type == 'video/mp4' %}
+    <video class="product-video" controls playsinline preload="metadata" aria-label="{{ product.name }} video {{ loop.index }}"><source src="{{ url_for('products.product_image', image_id=media.id) }}" type="video/mp4">Your browser does not support video playback.</video>
+    {% endfor %}
+    {% if product.primary_image %}<p class="gallery-help">Select a photo below to explore every angle or the size chart. Click the large photo to open it at full size in a new tab.</p>{% endif %}
+  </div>
+  <div class="shopping-product-info">
+    {% if product.category and product.category.is_active %}<a class="eyebrow" href="{{ url_for('products.shop', category=product.category.slug) }}">{{ product.category.name }}</a>{% endif %}
+    <h1>{{ product.name }}</h1>
+    {% if product.show_price %}
+    <p class="shopping-price price-display" aria-live="polite"><del data-original-price {% if product.sale_price is none or product.sale_price >= product.base_price or min_price != product.current_price %}hidden{% endif %}>&#8377;{{ '%.2f'|format(product.base_price) }}</del><span data-variant-price>&#8377;{{ '%.2f'|format(min_price) }}{% if max_price != min_price %} &ndash; &#8377;{{ '%.2f'|format(max_price) }}{% endif %}</span></p>
+    {% endif %}
+    <p class="muted">Cash on delivery &middot; Free delivery</p>
+    {% if selected_variant %}<p>Selected: {{ selected_variant.size.name if selected_variant.size else 'One size' }} / {{ selected_variant.color.name if selected_variant.color else 'Default' }}{% if not selected_variant.inventory or selected_variant.inventory.quantity <= selected_variant.inventory.reserved_quantity %} &mdash; sold out. Choose an available option below.{% endif %}</p>{% endif %}
+    {% if product.description %}<div class="shopping-description">{{ product.description }}</div>{% endif %}
+    {% if product.product_status != 'available' %}
+      {% include 'shop/_interest.html' %}
+    {% elif available_variants %}
+      <form class="shopping-purchase" method="post" action="{{ url_for('cart.add') }}" data-variant-form>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        {% include 'shop/_variant_fields.html' %}
+        <p id="variant-stock" class="muted" data-variant-stock aria-live="polite">Choose an option to see availability.</p>
+        <label for="quantity">Quantity for selected size</label><div class="quantity-stepper"><button type="button" data-quantity-step="-1" aria-label="Decrease quantity" hidden>&minus;</button><input id="quantity" name="quantity" type="number" min="1" max="99" value="1" required inputmode="numeric"><button type="button" data-quantity-step="1" aria-label="Increase quantity" hidden>&plus;</button></div>
+        <button type="submit" class="button">Add to cart</button>
+        <p class="muted">Need more than one size? Add a size and quantity to your bag, then return here to add the next. Each size stays separate in your order.</p>
+      </form>
+
+    {% else %}<div class="cod-panel"><span class="status-badge">OUT OF STOCK</span><p>This product is currently unavailable.</p><a class="subtle-link" href="{{ url_for('products.shop') }}">Explore other styles</a></div>{% endif %}
+    {% if product.specifications %}<div class="shopping-specifications"><h2>The details</h2>{% for specification in product.specifications %}<div class="summary-line"><span>{{ specification.name }}</span><strong>{{ specification.value }}</strong></div>{% endfor %}</div>{% endif %}
+    <p class="muted"><a href="{{ url_for('main.returns') }}">Return or exchange requests within 5 days of delivery</a></p>
+    <p class="muted shopping-cod-note">Place your order without paying now. Our team will confirm it and call you shortly after confirmation.</p>
+  </div>
+</div>
+</section>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% set photos = product.images|rejectattr('mime_type', 'equalto', 'video/mp4')|list %}
+{% if photos|length > 1 %}
+<div class="product-photo-controls" data-photo-controls>
+<div class="product-photo-navigation"><button type="button" data-photo-prev aria-label="Previous photo" hidden>&lsaquo;</button>
+<span class="photo-slide-hint">Swipe or drag to see more</span>
+<button type="button" data-photo-next aria-label="Next photo" hidden>&rsaquo;</button></div>
+<span data-photo-count aria-live="polite">Photo 1 of {{ photos|length }}</span>
+<div class="product-photo-options">{% for image in photos %}<button type="button" data-product-image="{{ url_for('products.product_image', image_id=image.id) }}" data-photo-source="{{ url_for('products.product_image', image_id=image.id) }}" data-photo-alt="{{ product.name }} — photo {{ loop.index }}" aria-label="View photo {{ loop.index }} of {{ product.name }}" aria-pressed="{{ 'true' if image.id == product.primary_image.id else 'false' }}"><img src="{{ url_for('products.product_image', image_id=image.id) }}" alt="" loading="lazy"></button>{% endfor %}</div>
+</div>
+{% endif %}

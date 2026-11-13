@@ -1,0 +1,16 @@
+[Unit]
+Description=Send bounded AURK operational failure notification for %i
+After=network-online.target
+[Service]
+Type=oneshot
+User=ubuntu
+WorkingDirectory=/home/ubuntu/Aurk
+EnvironmentFile=-/etc/aurk/alerts.env
+StateDirectory=aurk-alerts
+StateDirectoryMode=0700
+UMask=0077
+ExecStart=/home/ubuntu/Aurk/.venv/bin/python /home/ubuntu/Aurk/scripts/operational_alert.py %i
+TimeoutStartSec=1min
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
